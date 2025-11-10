@@ -7,6 +7,19 @@ import { Menu, X } from "lucide-react"
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
 
+  const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault()
+    const targetElement = document.getElementById(targetId.replace('#', ''))
+    if (targetElement) {
+      targetElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    }
+    // Close mobile menu after clicking
+    setIsOpen(false)
+  }
+
   return (
     <nav className="fixed top-0 w-full bg-background/80 backdrop-blur-md border-b border-border z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -20,15 +33,27 @@ export default function Navbar() {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
-            <Link href="#features" className="text-foreground hover:text-primary transition">
+            <a 
+              href="#features" 
+              onClick={(e) => handleSmoothScroll(e, '#features')}
+              className="text-foreground hover:text-primary transition cursor-pointer"
+            >
               Features
-            </Link>
-            <Link href="#how-it-works" className="text-foreground hover:text-primary transition">
+            </a>
+            <a 
+              href="#how-it-works" 
+              onClick={(e) => handleSmoothScroll(e, '#how-it-works')}
+              className="text-foreground hover:text-primary transition cursor-pointer"
+            >
               How It Works
-            </Link>
-            <Link href="#pricing" className="text-foreground hover:text-primary transition">
+            </a>
+            <a 
+              href="#pricing" 
+              onClick={(e) => handleSmoothScroll(e, '#pricing')}
+              className="text-foreground hover:text-primary transition cursor-pointer"
+            >
               Pricing
-            </Link>
+            </a>
             <Link href="#" className="text-foreground hover:text-primary transition">
               Docs
             </Link>
@@ -56,15 +81,27 @@ export default function Navbar() {
         {/* Mobile Menu */}
         {isOpen && (
           <div className="md:hidden pb-4 border-t border-border">
-            <Link href="#features" className="block py-2 text-foreground hover:text-primary">
+            <a 
+              href="#features" 
+              onClick={(e) => handleSmoothScroll(e, '#features')}
+              className="block py-2 text-foreground hover:text-primary cursor-pointer"
+            >
               Features
-            </Link>
-            <Link href="#how-it-works" className="block py-2 text-foreground hover:text-primary">
+            </a>
+            <a 
+              href="#how-it-works" 
+              onClick={(e) => handleSmoothScroll(e, '#how-it-works')}
+              className="block py-2 text-foreground hover:text-primary cursor-pointer"
+            >
               How It Works
-            </Link>
-            <Link href="#pricing" className="block py-2 text-foreground hover:text-primary">
+            </a>
+            <a 
+              href="#pricing" 
+              onClick={(e) => handleSmoothScroll(e, '#pricing')}
+              className="block py-2 text-foreground hover:text-primary cursor-pointer"
+            >
               Pricing
-            </Link>
+            </a>
             <Link href="#" className="block py-2 text-foreground hover:text-primary">
               Docs
             </Link>
