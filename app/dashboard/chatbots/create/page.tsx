@@ -1,15 +1,22 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronRight, CheckCircle2, Circle } from 'lucide-react';
+import { ChevronRight, CheckCircle2, Circle, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import BasicInfoStep from '@/components/wizard/basic-info-step';
 import KnowledgeBaseStep from '@/components/wizard/knowledge-base-step';
 import ChatConfigStep from '@/components/wizard/chat-config-step';
 import PreviewPanel from '@/components/wizard/preview-panel';
 import { Button } from '@/components/ui/button';
+import { useChatbot } from '@/hooks/useChatbot';
 
 export default function CreateChatbotPage() {
   const [currentStep, setCurrentStep] = useState(0);
+  const [isCreating, setIsCreating] = useState(false);
+  const router = useRouter();
+  const { createChatbot, isLoading, error } = useChatbot();
+  
   const [formData, setFormData] = useState({
     name: '',
     model: 'gpt-4-turbo',
@@ -44,9 +51,53 @@ export default function CreateChatbotPage() {
     }
   };
 
-  const handleCreateChatbot = () => {
-    console.log('Creating chatbot with:', formData);
-    // API call would go here
+  const validateCurrentStep = () => {
+    switch (currentStep) {
+      case 0:
+        if (!formData.name.trim()) {
+          toast.error('Please enter a chatbot name');
+          return false;
+        }
+        if (!formData.model) {
+          toast.error('Please select an AI model');
+          return false;
+        }
+        break;
+      case 1:
+        // Knowledge base is optional, so no validation needed
+        break;
+      case 2:
+        // Configuration has defaults, so no validation needed
+        break;
+    }
+    return true;
+  };
+
+  const handleCreateChatbot = async () => {
+    if (!validateCurrentStep()) {
+      return;
+    }
+
+    setIsCreating(true);
+    
+    try {
+      console.log('Form data being sent:', formData);
+      console.log('Commands specifically:', formData.commands);
+      
+      const result = await createChatbot(formData);
+      
+      if (result.success) {
+        toast.success('Chatbot created successfully!');
+        router.push('/dashboard/chatbots');
+      } else {
+        toast.error(result.error || 'Failed to create chatbot');
+      }
+    } catch (error) {
+      console.error('Error creating chatbot:', error);
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   const renderStepContent = () => {
@@ -134,15 +185,27 @@ export default function CreateChatbotPage() {
               </Button>
 
               {currentStep < steps.length - 1 ? (
-                <Button onClick={handleNext} className="px-6 bg-primary hover:bg-primary/90 text-primary-foreground gap-2">
+                <Button 
+                  onClick={handleNext} 
+                  disabled={!validateCurrentStep()} 
+                  className="px-6 bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
+                >
                   Next <ChevronRight size={18} />
                 </Button>
               ) : (
                 <Button
                   onClick={handleCreateChatbot}
+                  disabled={isCreating || isLoading}
                   className="px-8 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold gap-2"
                 >
-                  Create Chatbot
+                  {isCreating || isLoading ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    'Create Chatbot'
+                  )}
                 </Button>
               )}
             </div>

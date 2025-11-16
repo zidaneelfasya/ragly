@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Upload, FileText, Loader2, CheckCircle2 } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Upload, FileText, Loader2, CheckCircle2, X } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -13,10 +13,8 @@ interface KnowledgeBaseStepProps {
 
 export default function KnowledgeBaseStep({ data, setData }: KnowledgeBaseStepProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const [files, setFiles] = useState<any[]>([
-    { id: 1, name: 'product-guide.pdf', size: '2.4 MB', status: 'completed' },
-    { id: 2, name: 'faq.docx', size: '1.2 MB', status: 'processing' },
-  ]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -30,7 +28,63 @@ export default function KnowledgeBaseStep({ data, setData }: KnowledgeBaseStepPr
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    // Handle files
+    const files = Array.from(e.dataTransfer.files);
+    handleFiles(files);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      handleFiles(files);
+    }
+  };
+
+  const handleFiles = (files: File[]) => {
+    // Validate file types and sizes
+    const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+    const maxSize = 50 * 1024 * 1024; // 50MB
+
+    const validFiles = files.filter(file => {
+      if (!validTypes.includes(file.type)) {
+        console.warn(`File type ${file.type} not supported for ${file.name}`);
+        return false;
+      }
+      if (file.size > maxSize) {
+        console.warn(`File ${file.name} is too large (${Math.round(file.size / 1024 / 1024)}MB)`);
+        return false;
+      }
+      return true;
+    });
+
+    if (validFiles.length > 0) {
+      const newFiles = validFiles.map(file => ({
+        id: Date.now() + Math.random(),
+        name: file.name,
+        size: formatFileSize(file.size),
+        status: 'pending',
+        file: file
+      }));
+
+      setData({ 
+        ...data, 
+        files: [...(data.files || []), ...newFiles] 
+      });
+    }
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const removeFile = (fileId: number) => {
+    setData({
+      ...data,
+      files: (data.files || []).filter((file: any) => file.id !== fileId)
+    });
   };
 
   const getStatusColor = (status: string) => {
@@ -39,8 +93,10 @@ export default function KnowledgeBaseStep({ data, setData }: KnowledgeBaseStepPr
         return 'text-green-600 dark:text-green-400';
       case 'processing':
         return 'text-blue-600 dark:text-blue-400';
-      default:
+      case 'pending':
         return 'text-yellow-600 dark:text-yellow-400';
+      default:
+        return 'text-gray-600 dark:text-gray-400';
     }
   };
 
@@ -59,7 +115,7 @@ export default function KnowledgeBaseStep({ data, setData }: KnowledgeBaseStepPr
     <div className="space-y-8">
       {/* File Uploader */}
       <div>
-        <Label className="text-base font-semibold  block">Upload Knowledge (optional)</Label>
+        <Label className="text-base font-semibold block">Upload Knowledge (optional)</Label>
         <Label className="text-small font-normal mb-8 text-muted-foreground">you can change this option on dashboard menu options</Label>
 
         <div
@@ -73,19 +129,34 @@ export default function KnowledgeBaseStep({ data, setData }: KnowledgeBaseStepPr
           <Upload className="mx-auto mb-3 text-muted-foreground" size={32} />
           <p className="font-semibold text-foreground mb-1">Drag & drop your files here</p>
           <p className="text-sm text-muted-foreground mb-4">or</p>
-          <Button type="button" variant="outline" className="border-primary text-primary hover:bg-primary/5">
+          <Button 
+            type="button" 
+            variant="outline" 
+            className="border-primary text-primary hover:bg-primary/5"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+          >
+            {uploading ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
             Browse Files
           </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept=".pdf,.docx,.txt"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
           <p className="text-xs text-muted-foreground mt-4">Supported: PDF, DOCX, TXT (max 50MB each)</p>
         </div>
       </div>
 
       {/* File List */}
-      {files.length > 0 && (
+      {data.files && data.files.length > 0 && (
         <div>
           <h3 className="font-semibold text-foreground mb-3">Uploaded Files</h3>
           <div className="space-y-2">
-            {files.map((file) => (
+            {data.files.map((file: any) => (
               <div
                 key={file.id}
                 className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border hover:border-primary/30 transition-all"
@@ -97,9 +168,17 @@ export default function KnowledgeBaseStep({ data, setData }: KnowledgeBaseStepPr
                     <p className="text-xs text-muted-foreground">{file.size}</p>
                   </div>
                 </div>
-                <span className={`text-xs font-medium capitalize ${getStatusColor(file.status)}`}>
-                  {file.status}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-medium capitalize ${getStatusColor(file.status)}`}>
+                    {file.status}
+                  </span>
+                  <button
+                    onClick={() => removeFile(file.id)}
+                    className="text-destructive hover:text-destructive/80 transition-colors p-1"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -135,11 +214,6 @@ export default function KnowledgeBaseStep({ data, setData }: KnowledgeBaseStepPr
         />
         <p className="text-xs text-muted-foreground mt-1">We'll crawl and extract knowledge from this URL</p>
       </div>
-
-      {/* Embed Button */}
-      <Button className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base">
-        Embed Knowledge Base
-      </Button>
     </div>
   );
 }

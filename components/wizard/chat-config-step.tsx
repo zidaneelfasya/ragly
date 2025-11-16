@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -25,19 +25,39 @@ export default function ChatConfigStep({ data, setData }: ChatConfigStepProps) {
 
   const tones = ['Friendly', 'Professional', 'Direct', 'Formal', 'Casual'];
 
+  // Initialize commands in parent data when component mounts
+  useEffect(() => {
+    if (!data.commands || data.commands.length === 0) {
+      const defaultCommands = [{ command: '/help', description: 'Get help with common questions' }];
+      setCommands(defaultCommands);
+      setData({ ...data, commands: defaultCommands });
+    } else {
+      setCommands(data.commands);
+    }
+  }, []); // Empty dependency array to run only on mount
+
+  // Update parent data whenever local commands change
+  const updateParentData = (newCommands: any[]) => {
+    setData((prevData: any) => ({ ...prevData, commands: newCommands }));
+  };
+
   const addCommand = () => {
-    setCommands([...commands, { command: '', description: '' }]);
+    const newCommands = [...commands, { command: '', description: '' }];
+    setCommands(newCommands);
+    updateParentData(newCommands);
   };
 
   const removeCommand = (index: number) => {
-    setCommands(commands.filter((_, i) => i !== index));
+    const newCommands = commands.filter((_, i) => i !== index);
+    setCommands(newCommands);
+    updateParentData(newCommands);
   };
 
   const updateCommand = (index: number, field: string, value: string) => {
     const updated = [...commands];
     updated[index] = { ...updated[index], [field]: value };
     setCommands(updated);
-    setData({ ...data, commands: updated });
+    updateParentData(updated);
   };
 
   return (
@@ -132,7 +152,7 @@ export default function ChatConfigStep({ data, setData }: ChatConfigStepProps) {
       {/* Tone & Temperature */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <Label htmlFor="tone" className="text-base font-semibold mb-2 block">
+          <Label htmlFor="tone" className="text-base font-semibold mb-2">
             Tone & Style
           </Label>
           <Select value={data.tone} onValueChange={(value) => setData({ ...data, tone: value })}>
@@ -150,7 +170,7 @@ export default function ChatConfigStep({ data, setData }: ChatConfigStepProps) {
         </div>
 
         <div>
-          <Label htmlFor="temperature" className="text-base font-semibold mb-2 block flex justify-between">
+          <Label htmlFor="temperature" className="text-base font-semibold mb-2 flex justify-between">
             <span>Temperature</span>
             <span className="text-primary font-bold">{data.temperature.toFixed(1)}</span>
           </Label>
