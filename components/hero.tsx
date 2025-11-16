@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { ArrowRight, Play } from "lucide-react"
+import ChatPreview from "./chat-preview"
 
 export default function Hero() {
   return (
@@ -11,7 +12,7 @@ export default function Hero() {
           {/* Left Content */}
           <div className="flex flex-col justify-center">
             <div className="inline-block w-fit mb-4 px-4 py-2 bg-accent/10 border border-accent rounded-full">
-              <span className="text-accent text-sm font-medium">Build AI-Powered Chatbots</span>
+              <span className="text- text-sm font-medium">Build AI-Powered Chatbots</span>
             </div>
 
             <h1 className="text-5xl md:text-6xl font-bold leading-tight text-foreground mb-6">
@@ -40,34 +41,8 @@ export default function Hero() {
           </div>
 
           {/* Right - Interactive Preview */}
-          <div className="relative h-96 md:h-full min-h-96">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl blur-3xl"></div>
-            <div className="relative glass-effect rounded-2xl p-8 h-full flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-primary"></div>
-                  <div className="w-3 h-3 rounded-full bg-accent"></div>
-                  <div className="w-3 h-3 rounded-full bg-muted"></div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="bg-white/10 rounded-lg p-4 max-w-xs">
-                  <p className="text-sm text-foreground">How does RAG technology work?</p>
-                </div>
-
-                <div className="ml-auto bg-primary/20 rounded-lg p-4 max-w-xs">
-                  <p className="text-sm text-primary">
-                    RAG retrieves relevant information from your knowledge base before generating responses, ensuring
-                    accurate and contextual answers.
-                  </p>
-                </div>
-
-                <div className="bg-white/10 rounded-lg p-4 max-w-xs">
-                  <p className="text-sm text-foreground">Can I customize responses?</p>
-                </div>
-              </div>
-            </div>
+          <div className="relative h-96 md:h-full min-h-96 flex items-center justify-center">
+            <ChatPreview />
           </div>
         </div>
       </div>

@@ -9,6 +9,14 @@
 	html {
 		scroll-behavior: smooth;
 	}
+
+	/* Hide scrollbar for chat preview */
+	.scrollbar-hide {
+		-webkit-overflow-scrolling: touch;
+	}
+	.scrollbar-hide::-webkit-scrollbar {
+		display: none;
+	}
 	
 	:root {
 		--background: 0 0% 100%;
