@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { ChevronRight, CheckCircle2, Circle, Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { ChevronRight, CheckCircle2, Circle, Loader2, ArrowLeft } from 'lucide-react';
+import { useRouter, useParams } from 'next/navigation';
 import { toast } from 'sonner';
+import Link from 'next/link';
 import BasicInfoStep from '@/components/wizard/basic-info-step';
 import KnowledgeBaseStep from '@/components/wizard/knowledge-base-step';
 import ChatConfigStep from '@/components/wizard/chat-config-step';
@@ -11,11 +12,13 @@ import PreviewPanel from '@/components/wizard/preview-panel';
 import { Button } from '@/components/ui/button';
 import { useChatbot } from '@/hooks/useChatbot';
 
-export default function CreateChatbotPage() {
+export default function EditChatbotPage() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [isCreating, setIsCreating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const { createChatbot, isLoading, error } = useChatbot();
+  const params = useParams();
+  const { updateChatbot, fetchChatbot } = useChatbot();
   
   const [formData, setFormData] = useState({
     name: '',
@@ -38,6 +41,54 @@ export default function CreateChatbotPage() {
     { title: 'Knowledge Base', icon: Circle },
     { title: 'Configuration', icon: Circle },
   ];
+
+  useEffect(() => {
+    loadChatbotData();
+  }, [params.id]);
+
+  const loadChatbotData = async () => {
+    try {
+      setIsLoading(true);
+      const chatbot = await fetchChatbot(params.id as string);
+      
+      if (chatbot) {
+        // Transform chatbot data to match form structure
+        const commands = chatbot.chatbot_commands?.map((cmd: any) => ({
+          command: cmd.command_name,
+          description: cmd.command_description
+        })) || [];
+
+        const files = chatbot.chatbot_rag_files?.map((file: any) => ({
+          id: file.id || Date.now(),
+          name: file.original_name,
+          size: '0 KB',
+          status: 'completed'
+        })) || [];
+
+        setFormData({
+          name: chatbot.name || '',
+          model: chatbot.model || 'gpt-4-turbo',
+          language: chatbot.language || 'en',
+          isPublic: chatbot.is_public || false,
+          personality: chatbot.personality || '',
+          files: files,
+          manualKnowledge: chatbot.manual_knowledge || '',
+          knowledgeUrl: chatbot.knowledge_url || '',
+          commands: commands.length > 0 ? commands : [{ command: '/help', description: 'Get help with common questions' }],
+          welcomeMessage: chatbot.welcome_message || 'Hello! How can I help you today?',
+          fallbackMessage: chatbot.fallback_message || 'I apologize, but I could not find an answer to your question.',
+          tone: chatbot.tone || 'Friendly',
+          temperature: chatbot.temperature || 0.7,
+        });
+      }
+    } catch (error) {
+      console.error('Error loading chatbot:', error);
+      toast.error('Failed to load chatbot data');
+      router.push('/dashboard/chatbots');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -73,30 +124,30 @@ export default function CreateChatbotPage() {
     return true;
   };
 
-  const handleCreateChatbot = async () => {
+  const handleUpdateChatbot = async () => {
     if (!validateCurrentStep()) {
       return;
     }
 
-    setIsCreating(true);
+    setIsUpdating(true);
     
     try {
-      console.log('Form data being sent:', formData);
+      console.log('Form data being sent for update:', formData);
       console.log('Commands specifically:', formData.commands);
       
-      const result = await createChatbot(formData);
+      const result = await updateChatbot(params.id as string, formData);
       
       if (result.success) {
-        toast.success('Chatbot created successfully!');
+        toast.success('Chatbot updated successfully!');
         router.push('/dashboard/chatbots');
       } else {
-        toast.error(result.error || 'Failed to create chatbot');
+        toast.error(result.error || 'Failed to update chatbot');
       }
     } catch (error) {
-      console.error('Error creating chatbot:', error);
+      console.error('Error updating chatbot:', error);
       toast.error('An unexpected error occurred');
     } finally {
-      setIsCreating(false);
+      setIsUpdating(false);
     }
   };
 
@@ -113,13 +164,35 @@ export default function CreateChatbotPage() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 size={48} className="animate-spin text-primary mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-foreground">Loading chatbot...</h3>
+          <p className="text-muted-foreground">Please wait while we fetch your chatbot data</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="border-b border-border bg-card">
         <div className="max-w-7xl mx-auto px-6 py-4">
-          <h1 className="text-2xl font-bold text-foreground">Create New Chatbot</h1>
-          <p className="text-muted-foreground mt-1">Build your AI-powered chatbot in 3 simple steps</p>
+          <div className="flex items-center gap-4">
+            <Link href="/dashboard/chatbots">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <ArrowLeft size={16} />
+                Back
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Edit Chatbot</h1>
+              <p className="text-muted-foreground mt-1">Update your AI-powered chatbot configuration</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -133,7 +206,6 @@ export default function CreateChatbotPage() {
               {steps.map((step, index) => {
                 const isActive = index === currentStep;
                 const isCompleted = index < currentStep;
-                const Icon = step.icon;
 
                 return (
                   <div key={index} className="flex items-start gap-4">
@@ -158,8 +230,8 @@ export default function CreateChatbotPage() {
                         {step.title}
                       </h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {index === 0 && 'Set up your chatbot basic information'}
-                        {index === 1 && 'Upload your knowledge base'}
+                        {index === 0 && 'Update your chatbot basic information'}
+                        {index === 1 && 'Manage your knowledge base'}
                         {index === 2 && 'Configure chatbot behavior'}
                       </p>
                     </div>
@@ -194,17 +266,17 @@ export default function CreateChatbotPage() {
                 </Button>
               ) : (
                 <Button
-                  onClick={handleCreateChatbot}
-                  disabled={isCreating || isLoading}
+                  onClick={handleUpdateChatbot}
+                  disabled={isUpdating}
                   className="px-8 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold gap-2"
                 >
-                  {isCreating || isLoading ? (
+                  {isUpdating ? (
                     <>
                       <Loader2 size={18} className="animate-spin" />
-                      Creating...
+                      Updating...
                     </>
                   ) : (
-                    'Create Chatbot'
+                    'Update Chatbot'
                   )}
                 </Button>
               )}
