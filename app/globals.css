@@ -5,6 +5,19 @@
 @tailwind utilities;
 
 @layer base {
+	/* Smooth scroll behavior */
+	html {
+		scroll-behavior: smooth;
+	}
+
+	/* Hide scrollbar for chat preview */
+	.scrollbar-hide {
+		-webkit-overflow-scrolling: touch;
+	}
+	.scrollbar-hide::-webkit-scrollbar {
+		display: none;
+	}
+	
 	:root {
 		--background: 0 0% 100%;
 		--foreground: 210 25% 7.8431%;
