@@ -10,6 +10,25 @@
 		scroll-behavior: smooth;
 	}
 
+	/* Sidebar responsive styles */
+	.sidebar-collapsed {
+		--sidebar-width: 0px;
+	}
+
+	.sidebar-open {
+		--sidebar-width: 16rem; /* 64 * 0.25rem */
+	}
+
+	/* Desktop sidebar toggle */
+	@media (min-width: 1024px) {
+		.sidebar-collapsed main {
+			margin-left: 0;
+		}
+		.sidebar-open main {
+			margin-left: 16rem;
+		}
+	}
+
 	/* Hide scrollbar for chat preview */
 	.scrollbar-hide {
 		-webkit-overflow-scrolling: touch;
@@ -288,5 +307,43 @@
 	.leaflet-popup-content {
 		margin: 8px 12px;
 		line-height: 1.4;
+	}
+
+	/* Sidebar responsive styles */
+	.sidebar-collapsed {
+		--sidebar-width: 0px;
+	}
+
+	.sidebar-open {
+		--sidebar-width: 16rem;
+	}
+
+	/* Desktop sidebar toggle - when collapsed, hide sidebar and adjust main content */
+	@media (min-width: 1024px) {
+		.sidebar-collapsed aside {
+			transform: translateX(-100%) !important;
+		}
+		
+		.sidebar-collapsed main {
+			margin-left: 0 !important;
+		}
+
+		/* Adjust toggle button position when sidebar is collapsed */
+		.sidebar-collapsed .sidebar-toggle-desktop {
+			left: 1rem !important;
+		}
+
+		.sidebar-open .sidebar-toggle-desktop {
+			left: 17rem !important; /* 16rem sidebar + 1rem spacing */
+		}
+	}
+
+	/* Ensure smooth transitions */
+	main {
+		transition: margin-left 0.3s ease-in-out;
+	}
+
+	.sidebar-toggle-desktop {
+		transition: left 0.3s ease-in-out;
 	}
 }
