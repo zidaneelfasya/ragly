@@ -1,37 +1,47 @@
-import { AppSidebar } from "@/components/app-sidebar";
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
-import { DataTable } from "@/components/data-table";
-import { SectionCards } from "@/components/section-cards";
-import { SiteHeader } from "@/components/site-header";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import type React from "react"
+import type { Metadata } from "next"
+import { Geist, Geist_Mono } from "next/font/google"
+import { Analytics } from "@vercel/analytics/next"
+// import "./globals.css"
 
-import data from "./data.json";
-import { UserProvider } from "../context/user-context";
+const _geist = Geist({ subsets: ["latin"] })
+const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
-export default function AdminLayout({
-	children,
+export const metadata: Metadata = {
+  title: "Chatbot Helpdesk Konsultasi Digital Pemerintah Daerah - Komdigi",
+  description:
+    "Layanan konsultasi digital pemerintah daerah berbasis chatbot AI 24/7 dengan teknologi LLM dan Retrieval-Augmented Generation (RAG) untuk implementasi SPBE",
+  generator: "v0.app",
+  icons: {
+    icon: [
+      {
+        url: "/icon-light-32x32.png",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        url: "/icon-dark-32x32.png",
+        media: "(prefers-color-scheme: dark)",
+      },
+      {
+        url: "/icon.svg",
+        type: "image/svg+xml",
+      },
+    ],
+    apple: "/apple-icon.png",
+  },
+}
+
+export default function RootLayout({
+  children,
 }: Readonly<{
-	children: React.ReactNode;
+  children: React.ReactNode
 }>) {
-	return (
-		<UserProvider>
-			<SidebarProvider>
-				<AppSidebar variant="inset" />
-				<SidebarInset>
-					<SiteHeader />
-					<div className="flex flex-1 flex-col">
-						<div className="@container/main flex flex-1 flex-col gap-2">
-							<div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 overflow-x-auto">
-								{/* <SectionCards />
-              <div className="px-4 lg:px-6">
-                <ChartAreaInteractive />
-              </div> */}
-								{children}
-							</div>
-						</div>
-					</div>
-				</SidebarInset>
-			</SidebarProvider>
-		</UserProvider>
-	);
+  return (
+    <html lang="id">
+      <body className={`font-sans antialiased`}>
+        {children}
+        <Analytics />
+      </body>
+    </html>
+  )
 }
