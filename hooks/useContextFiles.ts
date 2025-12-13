@@ -21,6 +21,7 @@ export function useContextFiles() {
       ]);
       setFiles(filesData);
       setVectorstoreInfo(vectorstoreData);
+      console.log(vectorstoreData)
     } catch (error) {
       console.error('Error fetching files:', error);
       toast.error('Failed to fetch files');
