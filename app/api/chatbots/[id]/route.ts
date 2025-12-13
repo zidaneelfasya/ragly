@@ -3,11 +3,11 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
-    const chatbotId = params.id;
+    const { id } = await params; // Await params and destructure
 
     // Get the current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -24,7 +24,7 @@ export async function GET(
         chatbot_commands (*),
         chatbot_rag_files (*)
       `)
-      .eq('id', chatbotId)
+      .eq('id', id)
       .eq('user_id', user.id)
       .single();
 
@@ -49,11 +49,11 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
-    const chatbotId = params.id;
+    const { id } = await params; // Await params and destructure
 
     // Get the current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -105,7 +105,7 @@ export async function PUT(
         temperature: temperature || 0.7,
         updated_at: new Date().toISOString()
       })
-      .eq('id', chatbotId)
+      .eq('id', id)
       .eq('user_id', user.id)
       .select()
       .single();
@@ -122,7 +122,7 @@ export async function PUT(
     await supabase
       .from('chatbot_commands')
       .delete()
-      .eq('chatbot_id', chatbotId);
+      .eq('chatbot_id', id);
 
     if (commands && commands.length > 0) {
       const validCommands = commands.filter(
@@ -134,7 +134,7 @@ export async function PUT(
           .from('chatbot_commands')
           .insert(
             validCommands.map((cmd: any) => ({
-              chatbot_id: chatbotId,
+              chatbot_id: id,
               command_name: cmd.command.trim(),
               command_description: cmd.description.trim(),
               command_action: cmd.description.trim(),
@@ -171,11 +171,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
-    const chatbotId = params.id;
+    const { id } = await params; // Await params and destructure
 
     // Get the current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -188,7 +188,7 @@ export async function DELETE(
     const { error: deleteError } = await supabase
       .from('chatbots')
       .delete()
-      .eq('id', chatbotId)
+      .eq('id', id)
       .eq('user_id', user.id);
 
     if (deleteError) {

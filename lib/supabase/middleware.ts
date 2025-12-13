@@ -66,45 +66,45 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Check if user is trying to access admin routes
-  if (user && request.nextUrl.pathname.startsWith("/admin")) {
-    // Get user profile to check role
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.sub)
-      .single();
+  // if (user && request.nextUrl.pathname.startsWith("/admin")) {
+  //   // Get user profile to check role
+  //   const { data: profile } = await supabase
+  //     .from("profiles")
+  //     .select("role")
+  //     .eq("id", user.sub)
+  //     .single();
 
-    if (!profile || profile.role !== "admin") {
-      // User is not admin, redirect to dashboard
-      const url = request.nextUrl.clone();
-      url.pathname = "/access-denied";
-      return NextResponse.redirect(url);
-    }
+  //   if (!profile || profile.role !== "admin") {
+  //     // User is not admin, redirect to dashboard
+  //     const url = request.nextUrl.clone();
+  //     url.pathname = "/access-denied";
+  //     return NextResponse.redirect(url);
+  //   }
 
-    // Additional check for specific admin routes that require superadmin access
-    const restrictedAdminPaths = ["/admin/users", "/admin/context", "/admin/summary"];
-    const isRestrictedPath = restrictedAdminPaths.some(path => 
-      request.nextUrl.pathname.startsWith(path)
-    );
+  //   // Additional check for specific admin routes that require superadmin access
+  //   const restrictedAdminPaths = ["/admin/users", "/admin/context", "/admin/summary"];
+  //   const isRestrictedPath = restrictedAdminPaths.some(path => 
+  //     request.nextUrl.pathname.startsWith(path)
+  //   );
 
-    if (isRestrictedPath) {
-      // Get user's assigned units to check if they have superadmin access
-      const { data: userUnits } = await supabase
-        .from("user_unit_penanggungjawab")
-        .select("unit_id")
-        .eq("user_id", user.sub);
+  //   if (isRestrictedPath) {
+  //     // Get user's assigned units to check if they have superadmin access
+  //     const { data: userUnits } = await supabase
+  //       .from("user_unit_penanggungjawab")
+  //       .select("unit_id")
+  //       .eq("user_id", user.sub);
 
-      // Check if user has superadmin unit (unit_id = 1)
-      const isSuperAdmin = userUnits?.some(unit => unit.unit_id === 1) || false;
+  //     // Check if user has superadmin unit (unit_id = 1)
+  //     const isSuperAdmin = userUnits?.some(unit => unit.unit_id === 1) || false;
 
-      if (!isSuperAdmin) {
-        // User is not superadmin, redirect to no-access page
-        const url = request.nextUrl.clone();
-        url.pathname = "/admin/no-access";
-        return NextResponse.redirect(url);
-      }
-    }
-  }
+  //     if (!isSuperAdmin) {
+  //       // User is not superadmin, redirect to no-access page
+  //       const url = request.nextUrl.clone();
+  //       url.pathname = "/admin/no-access";
+  //       return NextResponse.redirect(url);
+  //     }
+  //   }
+  // }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
   // If you're creating a new response object with NextResponse.next() make sure to:
