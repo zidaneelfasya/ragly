@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Plus, Bot, Users, Globe, Lock, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { Plus, Bot, Users, Globe, Lock, MoreVertical, Edit, Trash2, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -138,8 +138,8 @@ export default function ChatbotsPage() {
           /* Chatbots Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {chatbots.map((chatbot) => (
-              <Card key={chatbot.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader className="pb-4">
+              <Card key={chatbot.id} className="hover:shadow-lg transition-shadow cursor-pointer group relative">
+                <CardHeader className="pb-4" onClick={() => window.location.href = `/dashboard/chatbots/${chatbot.id}`}>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
@@ -154,11 +154,22 @@ export default function ChatbotsPage() {
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 w-8 p-0"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <MoreVertical size={16} />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                          <Link href={`/dashboard/chatbots/${chatbot.id}`} className="flex items-center">
+                            <Eye size={16} className="mr-2" />
+                            Details
+                          </Link>
+                        </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link href={`/dashboard/chatbots/edit/${chatbot.id}`} className="flex items-center">
                             <Edit size={16} className="mr-2" />
@@ -184,7 +195,7 @@ export default function ChatbotsPage() {
                   </div>
                 </CardHeader>
                 
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4" onClick={() => window.location.href = `/dashboard/chatbots/${chatbot.id}`}>
                   <div className="flex items-center justify-between">
                     <Badge className={getStatusColor(chatbot.status)}>
                       {chatbot.status}
@@ -221,10 +232,19 @@ export default function ChatbotsPage() {
                   </div>
 
                   <div className="flex gap-2 pt-2">
-                    <Button variant="outline" size="sm" className="flex-1">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       View Analytics
                     </Button>
-                    <Button size="sm" className="flex-1">
+                    <Button 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       Test Chat
                     </Button>
                   </div>
