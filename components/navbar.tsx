@@ -61,7 +61,7 @@ export default function Navbar() {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/login" className="text-foreground hover:text-primary transition">
+            <Link href="/auth/login" className="text-foreground hover:text-primary transition">
               Sign In
             </Link>
             <Link
@@ -106,7 +106,7 @@ export default function Navbar() {
               Docs
             </Link>
             <div className="pt-4 flex flex-col gap-2">
-              <Link href="/login" className="text-center py-2 text-foreground hover:text-primary">
+              <Link href="/auth/login" className="text-center py-2 text-foreground hover:text-primary">
                 Sign In
               </Link>
               <Link
