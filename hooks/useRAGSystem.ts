@@ -37,7 +37,7 @@ export function useRAGSystem() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const ragApiUrl = 'http://localhost:8000/api/v1/ragly'; // Updated to use new API v1
+  const ragApiUrl = 'https://sort-edit-creatures-tall.trycloudflare.com/api/v1/ragly'; // Updated to use new API v1
 
   const uploadDocument = async (file: File, chatbotId: string) => {
     setIsLoading(true);

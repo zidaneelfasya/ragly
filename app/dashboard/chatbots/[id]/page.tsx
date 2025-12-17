@@ -16,9 +16,14 @@ import {
 	FileText,
 	Zap,
 	Activity,
+	Send,
+	Copy,
+	CheckCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	Card,
 	CardContent,
@@ -40,6 +45,11 @@ export default function ChatbotDetailPage() {
 
 	const [chatbot, setChatbot] = useState<any>(null);
 	const [deletingChatbot, setDeletingChatbot] = useState(false);
+	const [telegramBotToken, setTelegramBotToken] = useState("");
+	const [telegramBotUsername, setTelegramBotUsername] = useState("");
+	const [isCreatingTelegramBot, setIsCreatingTelegramBot] = useState(false);
+	const [telegramBotCreated, setTelegramBotCreated] = useState(false);
+	const [existingTelegramBot, setExistingTelegramBot] = useState<any>(null);
 	const { fetchChatbot, deleteChatbot, isLoading } = useChatbot();
 
 	useEffect(() => {
@@ -53,6 +63,8 @@ export default function ChatbotDetailPage() {
 			const data = await fetchChatbot(chatbotId);
 			if (data) {
 				setChatbot(data);
+				// Load Telegram bot configuration
+				await loadTelegramBot();
 			} else {
 				toast.error("Chatbot not found");
 				router.push("/dashboard/chatbots");
@@ -60,6 +72,21 @@ export default function ChatbotDetailPage() {
 		} catch (error) {
 			toast.error("Failed to load chatbot details");
 			router.push("/dashboard/chatbots");
+		}
+	};
+
+	const loadTelegramBot = async () => {
+		try {
+			const response = await fetch(`/api/chatbots/${chatbotId}/telegram`);
+			if (response.ok) {
+				const data = await response.json();
+				if (data.hasBot && data.telegramBot) {
+					setExistingTelegramBot(data.telegramBot);
+					setTelegramBotCreated(true);
+				}
+			}
+		} catch (error) {
+			console.error("Failed to load Telegram bot configuration:", error);
 		}
 	};
 
@@ -82,6 +109,87 @@ export default function ChatbotDetailPage() {
 			toast.error("An unexpected error occurred while deleting");
 		} finally {
 			setDeletingChatbot(false);
+		}
+	};
+
+	const handleCreateTelegramBot = async () => {
+		if (!telegramBotToken || !telegramBotUsername) {
+			toast.error("Please fill in both Bot Token and Bot Username");
+			return;
+		}
+
+		if (!telegramBotToken.includes(":")) {
+			toast.error("Invalid Bot Token format. Token should contain ':'");
+			return;
+		}
+
+		let username = telegramBotUsername;
+		if (!username.startsWith("@")) {
+			username = "@" + username;
+		}
+
+		setIsCreatingTelegramBot(true);
+
+		try {
+			const response = await fetch(`/api/chatbots/${chatbot.id}/telegram`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					botToken: telegramBotToken,
+					botUsername: username,
+					chatbotId: chatbot.id,
+				}),
+			});
+
+			const result = await response.json();
+
+			if (response.ok && result.success) {
+				toast.success("Telegram bot created successfully!");
+				setTelegramBotCreated(true);
+				setTelegramBotToken("");
+				setTelegramBotUsername("");
+				
+				// Reload Telegram bot configuration
+				await loadTelegramBot();
+			} else {
+				toast.error(result.error || "Failed to create Telegram bot");
+			}
+		} catch (error) {
+			console.error("Error creating Telegram bot:", error);
+			toast.error("An unexpected error occurred");
+		} finally {
+			setIsCreatingTelegramBot(false);
+		}
+	};
+
+	const copyToClipboard = (text: string) => {
+		navigator.clipboard.writeText(text).then(() => {
+			toast.success("Copied to clipboard!");
+		}).catch(() => {
+			toast.error("Failed to copy to clipboard");
+		});
+	};
+
+	const handleDeleteTelegramBot = async () => {
+		try {
+			const response = await fetch(`/api/chatbots/${chatbot.id}/telegram`, {
+				method: 'DELETE',
+			});
+
+			const result = await response.json();
+
+			if (response.ok && result.success) {
+				toast.success("Telegram bot removed successfully!");
+				setTelegramBotCreated(false);
+				setExistingTelegramBot(null);
+			} else {
+				toast.error(result.error || "Failed to remove Telegram bot");
+			}
+		} catch (error) {
+			console.error("Error deleting Telegram bot:", error);
+			toast.error("An unexpected error occurred");
 		}
 	};
 
@@ -446,6 +554,177 @@ export default function ChatbotDetailPage() {
 									<Zap size={16} className="mr-2" />
 									Deploy
 								</Button>
+							</CardContent>
+						</Card>
+
+						{/* Telegram Bot Integration */}
+						<Card>
+							<CardHeader>
+								<CardTitle className="flex items-center gap-2">
+									<Send size={20} />
+									Telegram Bot Integration
+								</CardTitle>
+								<CardDescription>
+									Connect your chatbot to Telegram by providing a bot token
+								</CardDescription>
+							</CardHeader>
+							<CardContent className="space-y-4">
+								{!telegramBotCreated ? (
+									<>
+										<div className="space-y-2">
+											<Label htmlFor="telegram-token">Bot Token</Label>
+											<div className="flex gap-2">
+												<Input
+													id="telegram-token"
+													type="password"
+													placeholder="1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefg"
+													value={telegramBotToken}
+													onChange={(e) => setTelegramBotToken(e.target.value)}
+													className="flex-1"
+												/>
+											</div>
+											<p className="text-xs text-muted-foreground">
+												Get your bot token from @BotFather on Telegram
+											</p>
+										</div>
+
+										<div className="space-y-2">
+											<Label htmlFor="telegram-username">Bot Username</Label>
+											<Input
+												id="telegram-username"
+												placeholder="@your_bot_username"
+												value={telegramBotUsername}
+												onChange={(e) => setTelegramBotUsername(e.target.value)}
+											/>
+											<p className="text-xs text-muted-foreground">
+												Enter your bot's username (with or without @)
+											</p>
+										</div>
+
+										<Button
+											onClick={handleCreateTelegramBot}
+											disabled={isCreatingTelegramBot || !telegramBotToken || !telegramBotUsername}
+											className="w-full"
+											size="sm"
+										>
+											{isCreatingTelegramBot ? (
+												<>
+													<div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+													Creating...
+												</>
+											) : (
+												<>
+													<Send size={16} className="mr-2" />
+													Create Telegram Bot
+												</>
+											)}
+										</Button>
+
+										{/* Help Section */}
+										<div className="p-3 bg-muted/50 rounded-lg">
+											<h4 className="font-medium text-sm mb-2">How to get Bot Token:</h4>
+											<ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
+												<li>
+													<a 
+														href="https://telegram.me/BotFather" 
+														target="_blank" 
+														rel="noopener noreferrer"
+														className="text-primary hover:underline"
+													>
+														Message @BotFather on Telegram
+													</a>
+												</li>
+												<li>Send /newbot command</li>
+												<li>Choose a name and username for your bot</li>
+												<li>Copy the token provided by BotFather</li>
+												<li>Paste the token above</li>
+											</ol>
+											<div className="mt-3 pt-3 border-t border-border/50">
+												<Button
+													variant="outline"
+													size="sm"
+													onClick={() => window.open('https://telegram.me/BotFather', '_blank')}
+													className="w-full"
+												>
+													<Send size={14} className="mr-2" />
+													Open BotFather
+												</Button>
+											</div>
+										</div>
+									</>
+								) : (
+									<div className="text-center py-4">
+										<div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+											<CheckCircle size={24} className="text-green-600" />
+										</div>
+										<h4 className="font-semibold text-green-700 mb-2">
+											Telegram Bot Active!
+										</h4>
+										{existingTelegramBot && (
+											<>
+												<p className="text-sm text-muted-foreground mb-2">
+													Bot: <span className="font-medium">{existingTelegramBot.bot_username}</span>
+												</p>
+												<p className="text-sm text-muted-foreground mb-4">
+													Your chatbot is connected and ready to receive messages
+												</p>
+											</>
+										)}
+										
+										<div className="space-y-3 text-left">
+											<div className="p-3 bg-muted/50 rounded-lg">
+												<div className="flex items-center justify-between mb-2">
+													<span className="text-xs font-medium text-muted-foreground">Webhook URL:</span>
+													<Button
+														variant="ghost"
+														size="sm"
+														onClick={() => copyToClipboard(existingTelegramBot?.webhook_url || `${window.location.origin}/api/telegram/webhook/${chatbot.id}`)}
+														className="h-6 px-2"
+													>
+														<Copy size={12} />
+													</Button>
+												</div>
+												<p className="text-xs text-muted-foreground break-all">
+													{existingTelegramBot?.webhook_url || `${window.location.origin}/api/telegram/webhook/${chatbot.id}`}
+												</p>
+											</div>
+
+											<div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+												<h5 className="text-sm font-medium text-blue-800 mb-1">How to test:</h5>
+												<ul className="text-xs text-blue-700 space-y-1">
+													<li>• Search for your bot on Telegram</li>
+													<li>• Send /start to begin conversation</li>
+													<li>• Ask questions related to your knowledge base</li>
+												</ul>
+											</div>
+										</div>
+
+										<div className="flex gap-2 mt-4">
+											<Button
+												variant="outline"
+												size="sm"
+												onClick={() => {
+													setTelegramBotCreated(false);
+													setExistingTelegramBot(null);
+													setTelegramBotToken("");
+													setTelegramBotUsername("");
+												}}
+												className="flex-1"
+											>
+												Create New Bot
+											</Button>
+											<Button
+												variant="destructive"
+												size="sm"
+												onClick={handleDeleteTelegramBot}
+												className="flex-1"
+											>
+												<Trash2 size={14} className="mr-1" />
+												Remove Bot
+											</Button>
+										</div>
+									</div>
+								)}
 							</CardContent>
 						</Card>
 

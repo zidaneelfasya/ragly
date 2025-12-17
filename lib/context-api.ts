@@ -1,7 +1,7 @@
 // lib/context-api.ts
 import { PDFFile, VectorstoreInfo, UploadResponse } from '@/types/context';
 
-const RAG_BASE_URL = 'http://localhost:8000';
+const RAG_BASE_URL = 'https://sort-edit-creatures-tall.trycloudflare.com';
 
 export class ContextAPI {
   // Get all PDF files
