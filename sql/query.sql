@@ -37,3 +37,30 @@ CREATE TABLE chatbot_commands (
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE TABLE IF NOT EXISTS chatbot_telegram_bots (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    chatbot_id UUID NOT NULL REFERENCES chatbots(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    bot_token TEXT NOT NULL,
+    bot_username TEXT NOT NULL,
+    webhook_url TEXT NOT NULL,
+    is_active BOOLEAN DEFAULT true,
+    session BOOLEAN DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(chatbot_id, user_id)
+);
+
+-- Create table for storing Telegram conversations (optional, for analytics)
+CREATE TABLE IF NOT EXISTS telegram_conversations (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    chatbot_id UUID NOT NULL REFERENCES chatbots(id) ON DELETE CASCADE,
+    telegram_user_id TEXT NOT NULL,
+    telegram_chat_id TEXT NOT NULL,
+    user_message TEXT,
+    ai_response TEXT,
+    timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    INDEX(chatbot_id, timestamp),
+    INDEX(telegram_chat_id, timestamp)
+);
