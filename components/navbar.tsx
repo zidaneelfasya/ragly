@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Menu, X } from "lucide-react"
+import Image from "next/image"
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -25,9 +26,12 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground">
+            {/* <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground">
               ◆
-            </div>
+            </div> */}
+            <Image src="/images/logo-ragly.svg" alt="Logo" width={32} height={32}>
+
+            </Image>
             ChatRAG
           </Link>
 
