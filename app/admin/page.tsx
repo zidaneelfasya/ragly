@@ -1,15 +1,6 @@
-import { DataTableAdminKonsultasi } from "@/components/data-table-admin-konsultasi";
-import { DataProvider } from "../context/data-context";
-import { UserProvider } from "../context/user-context";
+import { redirect } from 'next/navigation';
 
 export default function AdminPage() {
-	return (
-		<div className="">
-			<UserProvider>
-				<DataProvider>
-					<DataTableAdminKonsultasi data={[]} />
-				</DataProvider>
-			</UserProvider>
-		</div>
-	);
+  // Redirect to admin dashboard
+  redirect('/admin/dashboard');
 }

@@ -69,11 +69,12 @@ export default function AuthenticationPage() {
     }
 
     try {
+      // Sign up user with metadata - database trigger will automatically create profile
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: signupEmail,
         password: signupPassword,
         options: {
-          emailRedirectTo: `${window.location.origin}/protected`,
+          emailRedirectTo: `${window.location.origin}/dashboard`,
           data: {
             full_name: fullName,
             phone: phone,
@@ -83,33 +84,8 @@ export default function AuthenticationPage() {
 
       if (authError) throw authError;
 
-      if (authData.user) {
-        try {
-          const { error: profileError } = await supabase
-            .from("profiles")
-            .insert([
-              {
-                id: authData.user.id,
-                full_name: fullName,
-                phone: phone,
-                email: signupEmail,
-              },
-            ]);
-
-          if (profileError) {
-            console.warn(
-              "Profile creation failed, but user was created. Error:",
-              profileError
-            );
-          }
-        } catch (profileError) {
-          console.warn(
-            "Profile creation failed, but user was created. Error:",
-            profileError
-          );
-        }
-      }
-
+      // Profile will be automatically created by database trigger
+      // Redirect to success page
       router.push("/auth/sign-up-success");
     } catch (error: unknown) {
       console.error("Signup error:", error);
