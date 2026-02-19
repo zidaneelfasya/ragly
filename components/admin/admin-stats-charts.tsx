@@ -11,17 +11,21 @@ interface ChartData {
   chatbots: number;
 }
 
+type Timeline = 'week' | 'month' | 'year' | 'all';
+
 export function AdminStatsCharts() {
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [timeline, setTimeline] = useState<Timeline>('week');
 
   useEffect(() => {
     fetchChartData();
-  }, []);
+  }, [timeline]);
 
   const fetchChartData = async () => {
     try {
-      const response = await fetch('/api/admin/stats/chart-data');
+      setLoading(true);
+      const response = await fetch(`/api/admin/stats/chart-data?timeline=${timeline}`);
       if (response.ok) {
         const data = await response.json();
         setChartData(data);
@@ -48,13 +52,38 @@ export function AdminStatsCharts() {
     );
   }
 
+  const getTimelineLabel = () => {
+    switch (timeline) {
+      case 'week':
+        return '7 hari terakhir';
+      case 'month':
+        return 'bulan ini';
+      case 'year':
+        return 'tahun ini';
+      case 'all':
+        return 'semua waktu';
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Grafik Statistik</CardTitle>
-        <CardDescription>
-          Visualisasi data pengguna dan chatbot dalam 7 hari terakhir
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Grafik Statistik</CardTitle>
+            <CardDescription>
+              Visualisasi data pengguna dan chatbot {getTimelineLabel()}
+            </CardDescription>
+          </div>
+          <Tabs value={timeline} onValueChange={(value) => setTimeline(value as Timeline)} className="w-auto">
+            <TabsList>
+              <TabsTrigger value="week">Minggu</TabsTrigger>
+              <TabsTrigger value="month">Bulan</TabsTrigger>
+              <TabsTrigger value="year">Tahun</TabsTrigger>
+              <TabsTrigger value="all">Semua</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="area" className="space-y-4">
