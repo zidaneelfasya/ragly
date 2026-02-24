@@ -36,8 +36,10 @@ export interface SearchResult {
 export function useRAGSystem() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const api= process.env.RAG_BASE_URL || 'http://localhost:8080';
+  const ragApiUrl = `${api}/api/v1/ragly`; // Base URL for RAG API endpoints, adjust if needed
 
-  const ragApiUrl = 'https://sort-edit-creatures-tall.trycloudflare.com/api/v1/ragly'; // Updated to use new API v1
+  
 
   const uploadDocument = async (file: File, chatbotId: string) => {
     setIsLoading(true);
