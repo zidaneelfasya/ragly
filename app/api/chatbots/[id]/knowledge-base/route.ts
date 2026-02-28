@@ -6,11 +6,11 @@ import { existsSync } from 'fs';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: chatbotId } = await params;
     const supabase = await createClient();
-    const chatbotId = params.id;
 
     // Get the current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -150,11 +150,11 @@ export async function POST(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: chatbotId } = await params;
     const supabase = await createClient();
-    const chatbotId = params.id;
 
     // Get the current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -202,11 +202,11 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: chatbotId } = await params;
     const supabase = await createClient();
-    const chatbotId = params.id;
     const { searchParams } = new URL(request.url);
     const fileId = searchParams.get('fileId');
 

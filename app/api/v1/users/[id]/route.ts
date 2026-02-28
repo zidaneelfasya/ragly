@@ -25,9 +25,10 @@ async function checkIsAdmin(supabase: any, userId: string): Promise<boolean> {
 // GET endpoint untuk mengambil user tertentu
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabase = await createClient();
     
     // Check user authentication
@@ -47,8 +48,6 @@ export async function GET(
         { status: 403 }
       );
     }
-
-    const { id } = params;
 
     // Get user profile
     const { data: profile, error: profileError } = await supabase
@@ -99,9 +98,10 @@ export async function GET(
 // PUT endpoint untuk mengupdate user
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabase = await createClient();
     
     // Check user authentication
@@ -122,7 +122,6 @@ export async function PUT(
       );
     }
 
-    const { id } = params;
     const body = await request.json();
     const { full_name, phone, email, nip, jabatan, satuan_kerja, instansi, unit_id } = body;
 
@@ -208,9 +207,10 @@ export async function PUT(
 // DELETE endpoint untuk menghapus user
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabase = await createClient();
     
     // Check user authentication
@@ -230,8 +230,6 @@ export async function DELETE(
         { status: 403 }
       );
     }
-
-    const { id } = params;
 
     // Delete user from auth (this will cascade delete the profile due to foreign key)
     const { error: deleteError } = await supabase.auth.admin.deleteUser(id);

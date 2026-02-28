@@ -3,9 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabase = await createClient();
 
     // Check authentication and admin role
@@ -30,7 +31,7 @@ export async function GET(
     const { data: userProfile, error } = await supabase
       .from('profiles')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (error) {
@@ -49,9 +50,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabase = await createClient();
 
     // Check authentication and admin role
@@ -86,7 +88,7 @@ export async function PUT(
         email,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -113,9 +115,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabase = await createClient();
 
     // Check authentication and admin role
@@ -141,7 +144,7 @@ export async function DELETE(
     const { data: userProfile } = await supabase
       .from('profiles')
       .select('user_id')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (!userProfile) {

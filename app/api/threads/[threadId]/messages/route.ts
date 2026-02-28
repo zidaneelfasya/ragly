@@ -4,9 +4,10 @@ import { generateInitials, generateUserCode } from "@/lib/chat-utils";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { threadId: string } }
+  { params }: { params: Promise<{ threadId: string }> }
 ) {
   try {
+    const { threadId } = await params;
     const supabase = await createClient();
     
     // Get the current user
@@ -18,8 +19,6 @@ export async function GET(
         { status: 401 }
       );
     }
-
-    const { threadId } = params;
 
     // First verify the thread belongs to the user
     const { data: thread, error: threadError } = await supabase
@@ -105,9 +104,10 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { threadId: string } }
+  { params }: { params: Promise<{ threadId: string }> }
 ) {
   try {
+    const { threadId } = await params;
     const supabase = await createClient();
     
     // Get the current user
@@ -120,7 +120,6 @@ export async function POST(
       );
     }
 
-    const { threadId } = params;
     const { content, role = 'user' } = await request.json();
 
     if (!content?.trim()) {
