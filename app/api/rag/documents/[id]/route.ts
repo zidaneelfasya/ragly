@@ -4,12 +4,12 @@ const RAG_API_URL = process.env.RAG_BASE_URL || 'http://localhost:8000';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: documentId } = await params;
     const { searchParams } = new URL(request.url);
     const chatbotId = searchParams.get('chatbot_id');
-    const documentId = params.id;
 
     if (!chatbotId) {
       return NextResponse.json({ error: 'Chatbot ID is required' }, { status: 400 });

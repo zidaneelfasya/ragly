@@ -2,7 +2,7 @@
 
 import { TicketStatusSteps, TicketStatus } from "../../components/ticket-status-steps";
 import { Card, CardHeader, CardContent } from "../../components/ui/card";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import axios from "axios";
 
@@ -14,7 +14,7 @@ async function fetchTicket(ticketCode: string) {
   return res.data;
 }
 
-export default function TicketStatusPage() {
+function TicketStatusContent() {
   const searchParams = useSearchParams();
   const ticketCode = searchParams.get("ticket"); // ambil dari query string
   const [ticket, setTicket] = useState<any>(null);
@@ -93,5 +93,13 @@ export default function TicketStatusPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function TicketStatusPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+      <TicketStatusContent />
+    </Suspense>
   );
 }

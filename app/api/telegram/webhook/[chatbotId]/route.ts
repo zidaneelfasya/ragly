@@ -53,8 +53,8 @@ const DECISION_TYPES = {
 } as const;
 
 // Model configuration for efficiency
-const DECISION_MODEL = "gemini-2.5-flash-lite";  // Ringan & cepat untuk routing
-const RESPONSE_MODEL = "gemini-2.5-flash";        // Kualitas tinggi untuk response
+// const DECISION_MODEL = "gemini-2.5-flash-lite";  // Ringan & cepat untuk routing
+// const RESPONSE_MODEL = "gemini-2.5-flash";        // Kualitas tinggi untuk response
 
 // ========================================
 // QUOTA ERROR HANDLER
@@ -344,6 +344,13 @@ export async function POST(
     console.log('\n🚀 STARTING ASYNC PROCESSING');
     console.log('  - Returning 200 OK to Telegram immediately');
     console.log('  - Message will be processed in background');
+    
+    // Ensure userMessage is not undefined before passing
+    if (!userMessage) {
+      console.error('❌ ERROR: userMessage is undefined');
+      console.log('='.repeat(80) + '\n');
+      return NextResponse.json({ error: 'Invalid message' }, { status: 400 });
+    }
     
     // Process message asynchronously (don't await)
     processMessageAsync(

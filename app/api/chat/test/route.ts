@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       reply: reply,
       context_found: contextualChunks.length,
-      contexts: contextualChunks.map(chunk => {
+      contexts: contextualChunks.map((chunk: any) => {
         // Handle SearchResult structure untuk debugging
         return {
           content: chunk.content || chunk.text || chunk,

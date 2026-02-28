@@ -123,6 +123,44 @@ import { useData } from "@/app/context/data-context";
 import { useUser } from "@/app/context/user-context";
 import { ImportModal } from "./import-modal";
 
+// Helper component for expandable cell with useState hook
+function UraianCell({ uraianText }: { uraianText: string | null }) {
+	const [isExpanded, setIsExpanded] = React.useState(false);
+	const shouldTruncate = uraianText && uraianText.length > 100;
+
+	return (
+		<div className="max-w-[240px] w-full">
+			{uraianText ? (
+				<div className="flex flex-col items-start gap-2">
+					<button
+						onClick={() => setIsExpanded(!isExpanded)}
+						className="text-left hover:bg-muted/30 rounded px-2 py-1 transition-colors w-full group"
+					>
+						<div
+							className={`text-sm text-muted-foreground leading-relaxed transition-all duration-200 ${
+								isExpanded
+									? "whitespace-pre-wrap break-words"
+									: "line-clamp-3"
+							}`}
+						>
+							{uraianText}
+						</div>
+						{shouldTruncate && !isExpanded && (
+							<div className="text-xs text-blue-600 group-hover:text-blue-800 mt-1 font-medium">
+								Klik untuk lihat selengkapnya
+							</div>
+						)}
+					</button>
+				</div>
+			) : (
+				<span className="text-muted-foreground text-sm flex items-center gap-1">
+					Belum ada uraian kebutuhan
+				</span>
+			)}
+		</div>
+	);
+}
+
 export const konsultasiSchema = z.object({
 	id: z.number(),
 	nama_lengkap: z.string().nullable(),
@@ -2033,43 +2071,7 @@ const columns: ColumnDef<KonsultasiData>[] = [
 		accessorKey: "uraian_kebutuhan_konsultasi",
 		header: "Uraian Kebutuhan",
 		size: 240, // Set fixed width for uraian kebutuhan column
-		cell: ({ row }) => {
-			const [isExpanded, setIsExpanded] = React.useState(false);
-			const uraianText = row.original.uraian_kebutuhan_konsultasi;
-			const shouldTruncate = uraianText && uraianText.length > 100;
-
-			return (
-				<div className="max-w-[240px] w-full">
-					{uraianText ? (
-						<div className="flex flex-col items-start gap-2">
-							<button
-								onClick={() => setIsExpanded(!isExpanded)}
-								className="text-left hover:bg-muted/30 rounded px-2 py-1 transition-colors w-full group"
-							>
-								<div
-									className={`text-sm text-muted-foreground leading-relaxed transition-all duration-200 ${
-										isExpanded
-											? "whitespace-pre-wrap break-words"
-											: "line-clamp-3"
-									}`}
-								>
-									{uraianText}
-								</div>
-								{shouldTruncate && !isExpanded && (
-									<div className="text-xs text-blue-600 group-hover:text-blue-800 mt-1 font-medium">
-										Klik untuk lihat selengkapnya
-									</div>
-								)}
-							</button>
-						</div>
-					) : (
-						<span className="text-muted-foreground text-sm flex items-center gap-1">
-							Belum ada uraian kebutuhan
-						</span>
-					)}
-				</div>
-			);
-		},
+		cell: ({ row }) => <UraianCell uraianText={row.original.uraian_kebutuhan_konsultasi} />,
 	},
 	{
 		accessorKey: "units",
