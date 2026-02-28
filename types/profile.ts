@@ -2,6 +2,7 @@
 
 export interface Profile {
   id: string;
+  user_id: string;
   full_name: string | null;
   phone: string | null;
   email: string | null;
@@ -9,6 +10,9 @@ export interface Profile {
   jabatan: string | null;
   satuan_kerja: string | null;
   instansi: string | null;
+  role: 'user' | 'admin';
+  avatar_url: string | null;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }
