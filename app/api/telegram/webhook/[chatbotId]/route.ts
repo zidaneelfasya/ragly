@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import https from 'https';
 
 // LLM Service Configuration
 const LLM_SERVICE_URL = process.env.LLM_SERVICE_URL || 'http://localhost:8000';
@@ -466,6 +467,11 @@ async function processMessageAsync(
       const sendResult = await sendTelegramMessage(botToken, chatId, welcomeMessage);
       console.log('  - Send Result:', sendResult.ok ? '✅ Success' : '❌ Failed');
       
+      if (!sendResult.ok) {
+        console.error('  - Failed to send welcome message, but session is started');
+        console.error('  - Error details:', sendResult.description || sendResult.error);
+      }
+      
       const duration = Date.now() - startTime;
       console.log(`\n⏱️  Async Processing Duration: ${duration}ms`);
       console.log('─'.repeat(80) + '\n');
@@ -516,6 +522,11 @@ async function processMessageAsync(
         console.log('\n📤 Sending goodbye message to Telegram...');
         const sendResult = await sendTelegramMessage(botToken, chatId, 'Sesi telah berakhir. Gunakan /start untuk memulai sesi baru.');
         console.log('  - Send Result:', sendResult.ok ? '✅ Success' : '❌ Failed');
+        
+        if (!sendResult.ok) {
+          console.error('  - Failed to send goodbye message, but session is ended');
+          console.error('  - Error details:', sendResult.description || sendResult.error);
+        }
         
         const duration = Date.now() - startTime;
         console.log(`\n⏱️  Async Processing Duration: ${duration}ms`);
@@ -681,7 +692,7 @@ async function getContextFromRAG(message: string, chatbotId: string) {
   try {
     console.log('\n📚 [RAG Service] Fetching context from knowledge base');
     // Menggunakan endpoint yang sama dengan searchDocuments di useRAGSystem hook
-    const ragApiUrl = process.env.RAG_SERVICE_URL || process.env.RAG_BASE_URL || 'https://sort-edit-creatures-tall.trycloudflare.com';
+    const ragApiUrl = process.env.RAG_SERVICE_URL || process.env.RAG_BASE_URL ;
     const apiUrl = `${ragApiUrl}/api/v1/ragly/chatbots/${chatbotId}/query`;
     
     console.log(`  - RAG URL: ${apiUrl}`);
@@ -805,40 +816,134 @@ async function generateResponseWithContext(
 }
 
 
-async function sendTelegramMessage(botToken: string, chatId: number, text: string) {
-  try {
-    console.log('  📡 Sending to Telegram API...');
-    console.log('    - Chat ID:', chatId);
-    console.log('    - Message length:', text.length, 'chars');
-    
-    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: text,
-        parse_mode: 'Markdown',
-      }),
-    });
+async function sendTelegramMessage(botToken: string, chatId: number, text: string, retries = 3): Promise<any> {
+  const payload = {
+    chat_id: chatId,
+    text: text,
+    parse_mode: 'Markdown',
+  };
 
-    const data = await response.json();
-    
-    if (!data.ok) {
-      console.error('  ❌ Failed to send Telegram message');
-      console.error('    - Response:', JSON.stringify(data, null, 2));
-    } else {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      console.log(`  📡 Sending to Telegram API (attempt ${attempt}/${retries})...`);
+      console.log('    - Chat ID:', chatId);
+      console.log('    - Message length:', text.length, 'chars');
+      
+      if (attempt === 1) {
+        console.log('    - Bot Token (first 10 chars):', botToken.substring(0, 10) + '...');
+        console.log('    - Request payload:', JSON.stringify(payload));
+      }
+      
+      // Use https module instead of fetch to avoid ETIMEDOUT issues
+      const data = await new Promise<any>((resolve, reject) => {
+        const postData = JSON.stringify(payload);
+        
+        const options = {
+          hostname: 'api.telegram.org',
+          port: 443,
+          path: `/bot${botToken}/sendMessage`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(postData),
+          },
+          timeout: 10000, // 10 second timeout
+        };
+
+        const req = https.request(options, (res) => {
+          let responseData = '';
+
+          res.on('data', (chunk) => {
+            responseData += chunk;
+          });
+
+          res.on('end', () => {
+            try {
+              const jsonData = JSON.parse(responseData);
+              console.log('    - Response status:', res.statusCode);
+              resolve(jsonData);
+            } catch (parseError) {
+              reject(new Error(`Failed to parse response: ${responseData}`));
+            }
+          });
+        });
+
+        req.on('error', (error) => {
+          reject(error);
+        });
+
+        req.on('timeout', () => {
+          req.destroy();
+          reject(new Error('Request timeout after 10 seconds'));
+        });
+
+        req.write(postData);
+        req.end();
+      });
+      
+      if (!data.ok) {
+        console.error('  ❌ Failed to send Telegram message');
+        console.error('    - Response:', JSON.stringify(data, null, 2));
+        console.error('    - Error code:', data.error_code);
+        console.error('    - Error description:', data.description);
+        
+        // Don't retry on client errors (400-499)
+        if (data.error_code >= 400 && data.error_code < 500) {
+          return data;
+        }
+        
+        // Retry on server errors (500-599)
+        if (attempt < retries) {
+          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+          console.log(`    - Retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+        
+        return data;
+      }
+
       console.log('  ✅ Message sent successfully');
       console.log('    - Message ID:', data.result?.message_id);
+      return data;
+      
+    } catch (error: any) {
+      console.error(`  ❌ Exception sending Telegram message (attempt ${attempt}/${retries})`);
+      console.error('    - Error message:', error.message);
+      console.error('    - Error name:', error.name);
+      console.error('    - Error code:', error.code);
+      
+      if (error.cause) {
+        console.error('    - Underlying cause:', JSON.stringify(error.cause, null, 2));
+      }
+      
+      // If this is not the last attempt, retry with exponential backoff
+      if (attempt < retries) {
+        const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+        console.log(`    - Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      // Last attempt failed, return error
+      console.error('    - All retry attempts exhausted');
+      console.error('    - Stack:', error.stack);
+      
+      return {
+        ok: false,
+        error_code: 500,
+        description: `Failed to send message after ${retries} attempts: ${error.message}`,
+        error: error
+      };
     }
-
-    return data;
-  } catch (error: any) {
-    console.error('  ❌ Exception sending Telegram message:', error.message);
-    console.error('    - Stack:', error.stack);
-    throw error;
   }
+
+  // Should never reach here, but TypeScript needs it
+  return {
+    ok: false,
+    error_code: 500,
+    description: 'Unknown error sending message'
+  };
 }
 
 export async function GET() {
