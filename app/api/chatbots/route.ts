@@ -26,7 +26,8 @@ export async function POST(request: NextRequest) {
       tone,
       temperature,
       commands,
-      files
+      files,
+      status
     } = body;
 
     // Validate required fields
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
           fallback_message: fallbackMessage || 'I apologize, but I could not find an answer to your question.',
           tone: tone || 'Friendly',
           temperature: temperature || 0.7,
-          status: 'draft'
+          status: status || 'draft'
         }
       ])
       .select()
