@@ -16,6 +16,7 @@ interface CreateChatbotData {
   fallbackMessage: string;
   tone: string;
   temperature: number;
+  status?: string;
 }
 
 interface CreateChatbotResponse {
