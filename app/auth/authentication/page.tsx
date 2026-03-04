@@ -99,29 +99,29 @@ export default function AuthenticationPage() {
     }
   };
 
-  const handleGoogleAuth = () => {
-    console.log(`Google ${activeTab}`);
-  };
+    const handleGoogleAuth = () => {
+      console.log(`Google ${activeTab}`);
+    };
 
-  const handleFacebookAuth = () => {
-    console.log(`Facebook ${activeTab}`);
-  };
+    const handleFacebookAuth = () => {
+      console.log(`Facebook ${activeTab}`);
+    };
 
-  return (
-    <div className="flex min-h-screen w-full">
-      {/* Left Side - Geometric Design */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary/90 via-primary to-secondary/80 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div
-            className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-primary/40 to-transparent transform -translate-x-20 -translate-y-20"
-            style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
-          />
-        </div>
+    return (
+      <div className="flex min-h-screen w-full">
+        {/* Left Side - Geometric Design */}
+        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary/90 via-primary to-secondary/80 relative overflow-hidden">
+          <div className="absolute inset-0">
+            <div
+              className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-primary/40 to-transparent transform -translate-x-20 -translate-y-20"
+              style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
+            />
+          </div>
 
-        <div className="relative z-10 flex flex-col justify-center items-center px-12 py-20 text-white w-full">
-          <div className="text-center transition-all duration-500">
-            <h1 className="text-6xl font-bold mb-4">
-              {activeTab === "login" ? "LOGIN" : "SIGN UP"}
+          <div className="relative z-10 flex flex-col justify-center items-center px-12 py-20 text-white w-full">
+            <div className="text-center transition-all duration-500">
+              <h1 className="text-6xl font-bold mb-4">
+                {activeTab === "login" ? "LOGIN" : "SIGN UP"}
             </h1>
             <p className="text-xl text-white/90">
               {activeTab === "login" ? "Welcome back to Ragly" : "Join Ragly today"}
@@ -367,7 +367,7 @@ export default function AuthenticationPage() {
                 </svg>
                 Google
               </Button>
-              <Button
+              {/* <Button
                 type="button"
                 variant="outline"
                 className="flex-1 h-11 gap-2"
@@ -377,7 +377,7 @@ export default function AuthenticationPage() {
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                 </svg>
                 Facebook
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>
