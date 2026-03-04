@@ -22,10 +22,28 @@ export default function DashboardPage() {
   const loadStats = async () => {
     try {
       const chatbots = await fetchChatbots();
+      
+      // Fetch telegram stats for all chatbots
+      let totalConversations = 0;
+      
+      for (const chatbot of chatbots) {
+        try {
+          const response = await fetch(`/api/chatbots/${chatbot.id}/telegram-stats?timeframe=all`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.stats) {
+              totalConversations += data.stats.totalConversations || 0;
+            }
+          }
+        } catch (error) {
+          console.error(`Failed to load stats for chatbot ${chatbot.id}:`, error);
+        }
+      }
+      
       setStats({
         totalChatbots: chatbots.length,
         activeChatbots: chatbots.filter((c: any) => c.status === 'active').length,
-        totalChats: 0, // Will be implemented when chat analytics are added
+        totalChats: totalConversations,
       });
     } catch (error) {
       console.error('Failed to load stats:', error);
@@ -100,9 +118,9 @@ export default function DashboardPage() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalChats}</div>
+              <div className="text-2xl font-bold">{stats.totalChats.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">
-                +0% from last month
+                From all Telegram conversations
               </p>
             </CardContent>
           </Card>
