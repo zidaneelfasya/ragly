@@ -77,7 +77,8 @@ export async function PUT(
       tone,
       temperature,
       commands,
-      files
+      files,
+      status
     } = body;
 
     // Validate required fields
@@ -103,6 +104,7 @@ export async function PUT(
         fallback_message: fallbackMessage || 'I apologize, but I could not find an answer to your question.',
         tone: tone || 'Friendly',
         temperature: temperature || 0.7,
+        status: status,
         updated_at: new Date().toISOString()
       })
       .eq('id', id)
