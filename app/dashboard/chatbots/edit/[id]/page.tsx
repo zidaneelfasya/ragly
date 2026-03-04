@@ -156,7 +156,7 @@ export default function EditChatbotPage() {
       case 0:
         return <BasicInfoStep data={formData} setData={setFormData} />;
       case 1:
-        return <KnowledgeBaseStep data={formData} setData={setFormData} />;
+        return <KnowledgeBaseStep data={formData} setData={setFormData} chatbotId={params.id as string} />;
       case 2:
         return <ChatConfigStep data={formData} setData={setFormData} />;
       default:
