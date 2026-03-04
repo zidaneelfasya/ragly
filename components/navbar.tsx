@@ -1,12 +1,41 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Menu, X } from "lucide-react"
+import { Menu, X, LayoutDashboard, MessageSquare, User, LogOut } from "lucide-react"
 import Image from "next/image"
+import { createClient } from "@/lib/supabase/client"
+import { useRouter } from "next/navigation"
+import type { User as SupabaseUser } from "@supabase/supabase-js"
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [user, setUser] = useState<SupabaseUser | null>(null)
+  const router = useRouter()
+
+  useEffect(() => {
+    const supabase = createClient()
+    
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+    })
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const handleLogout = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    setIsUserMenuOpen(false)
+    router.push("/")
+  }
 
   const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     e.preventDefault()
@@ -63,17 +92,76 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* CTA Buttons */}
+          {/* CTA Buttons or User Menu */}
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/auth/login" className="text-foreground hover:text-primary transition">
-              Sign In
-            </Link>
-            <Link
-              href="/signup"
-              className="px-6 py-2 bg-primary text-primary-foreground rounded-full hover:bg-opacity-90 transition font-medium"
-            >
-              Get Started
-            </Link>
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-border hover:bg-accent transition"
+                >
+                  <Menu size={20} />
+                  <span className="text-sm font-medium">Menu</span>
+                </button>
+                
+                {/* Dropdown Menu */}
+                {isUserMenuOpen && (
+                  <>
+                    {/* Backdrop to close menu when clicking outside */}
+                    <div 
+                      className="fixed inset-0 z-40" 
+                      onClick={() => setIsUserMenuOpen(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-56 bg-background border border-border rounded-lg shadow-lg py-2 z-50">
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition"
+                      >
+                        <LayoutDashboard size={18} />
+                        <span>Dashboard</span>
+                      </Link>
+                      <Link
+                        href="/chat"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition"
+                      >
+                        <MessageSquare size={18} />
+                        <span>Chatbot</span>
+                      </Link>
+                      <Link
+                        href="/dashboard/profile"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition"
+                      >
+                        <User size={18} />
+                        <span>Profile</span>
+                      </Link>
+                      <div className="border-t border-border my-1" />
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition w-full text-left text-destructive"
+                      >
+                        <LogOut size={18} />
+                        <span>Logout</span>
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link href="/auth/authentication" className="text-foreground hover:text-primary transition">
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="px-6 py-2 bg-primary text-primary-foreground rounded-full hover:bg-opacity-90 transition font-medium"
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -109,17 +197,54 @@ export default function Navbar() {
             <Link href="#" className="block py-2 text-foreground hover:text-primary">
               Docs
             </Link>
-            <div className="pt-4 flex flex-col gap-2">
-              <Link href="/auth/login" className="text-center py-2 text-foreground hover:text-primary">
-                Sign In
-              </Link>
-              <Link
-                href="/signup"
-                className="text-center py-2 bg-primary text-primary-foreground rounded-full hover:bg-opacity-90 transition"
-              >
-                Get Started
-              </Link>
-            </div>
+            
+            {user ? (
+              <div className="pt-4 flex flex-col gap-2 border-t border-border mt-2">
+                <Link 
+                  href="/dashboard" 
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-3 py-2 text-foreground hover:text-primary"
+                >
+                  <LayoutDashboard size={18} />
+                  <span>Dashboard</span>
+                </Link>
+                <Link 
+                  href="/chat" 
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-3 py-2 text-foreground hover:text-primary"
+                >
+                  <MessageSquare size={18} />
+                  <span>Chatbot</span>
+                </Link>
+                <Link 
+                  href="/dashboard/profile" 
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-3 py-2 text-foreground hover:text-primary"
+                >
+                  <User size={18} />
+                  <span>Profile</span>
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 py-2 text-destructive hover:text-destructive/80 text-left"
+                >
+                  <LogOut size={18} />
+                  <span>Logout</span>
+                </button>
+              </div>
+            ) : (
+              <div className="pt-4 flex flex-col gap-2">
+                <Link href="/auth/login" className="text-center py-2 text-foreground hover:text-primary">
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="text-center py-2 bg-primary text-primary-foreground rounded-full hover:bg-opacity-90 transition"
+                >
+                  Get Started
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </div>
