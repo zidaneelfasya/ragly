@@ -37,6 +37,8 @@ import { useChatbot } from "@/hooks/useChatbot";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/delete-confirm-dialog";
 import KnowledgeBaseManager from "@/components/knowledge-base-manager";
+import TelegramStatsCard from "@/components/telegram-stats-card";
+import TelegramRecentActivity from "@/components/telegram-recent-activity";
 
 export default function ChatbotDetailPage() {
 	const params = useParams();
@@ -50,6 +52,7 @@ export default function ChatbotDetailPage() {
 	const [isCreatingTelegramBot, setIsCreatingTelegramBot] = useState(false);
 	const [telegramBotCreated, setTelegramBotCreated] = useState(false);
 	const [existingTelegramBot, setExistingTelegramBot] = useState<any>(null);
+	const [telegramStats, setTelegramStats] = useState<any>(null);
 	const { fetchChatbot, deleteChatbot, isLoading } = useChatbot();
 
 	useEffect(() => {
@@ -83,10 +86,26 @@ export default function ChatbotDetailPage() {
 				if (data.hasBot && data.telegramBot) {
 					setExistingTelegramBot(data.telegramBot);
 					setTelegramBotCreated(true);
+					// Load telegram statistics
+					await loadTelegramStats();
 				}
 			}
 		} catch (error) {
 			console.error("Failed to load Telegram bot configuration:", error);
+		}
+	};
+
+	const loadTelegramStats = async () => {
+		try {
+			const response = await fetch(`/api/chatbots/${chatbotId}/telegram-stats?timeframe=all`);
+			if (response.ok) {
+				const data = await response.json();
+				if (data.success) {
+					setTelegramStats(data.stats);
+				}
+			}
+		} catch (error) {
+			console.error("Failed to load Telegram statistics:", error);
 		}
 	};
 
@@ -532,6 +551,11 @@ export default function ChatbotDetailPage() {
 
 						{/* Knowledge Base */}
 						<KnowledgeBaseManager chatbotId={chatbot.id} />
+
+						{/* Telegram Statistics - Show only if bot is created */}
+						{telegramBotCreated && existingTelegramBot && (
+							<TelegramStatsCard chatbotId={chatbot.id} />
+						)}
 					</div>
 
 					{/* Right Column - Stats and Actions */}
@@ -728,6 +752,11 @@ export default function ChatbotDetailPage() {
 							</CardContent>
 						</Card>
 
+						{/* Telegram Recent Activity - Show only if bot is created */}
+						{telegramBotCreated && existingTelegramBot && (
+							<TelegramRecentActivity chatbotId={chatbot.id} />
+						)}
+
 						{/* Stats Card */}
 						<Card>
 							<CardHeader>
@@ -740,17 +769,21 @@ export default function ChatbotDetailPage() {
 								<div className="flex items-center justify-between">
 									<div className="flex items-center gap-2 text-muted-foreground">
 										<Users size={16} />
-										<span>Total Chats</span>
+										<span>Active Users</span>
 									</div>
-									<span className="font-semibold">0</span>
+									<span className="font-semibold">
+										{telegramStats?.uniqueUsers?.toLocaleString() || 0}
+									</span>
 								</div>
 
 								<div className="flex items-center justify-between">
 									<div className="flex items-center gap-2 text-muted-foreground">
 										<MessageSquare size={16} />
-										<span>Messages</span>
+										<span>Total Messages</span>
 									</div>
-									<span className="font-semibold">0</span>
+									<span className="font-semibold">
+										{telegramStats?.totalConversations?.toLocaleString() || 0}
+									</span>
 								</div>
 
 								<div className="flex items-center justify-between">
