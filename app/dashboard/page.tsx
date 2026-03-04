@@ -5,6 +5,7 @@ import { Plus, Bot, Users, BarChart3, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useChatbot } from '@/hooks/useChatbot';
 
 export default function DashboardPage() {
@@ -13,7 +14,8 @@ export default function DashboardPage() {
     totalChats: 0,
     activeChatbots: 0,
   });
-  const { fetchChatbots, isLoading } = useChatbot();
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+  const { fetchChatbots } = useChatbot();
 
   useEffect(() => {
     loadStats();
@@ -21,6 +23,7 @@ export default function DashboardPage() {
 
   const loadStats = async () => {
     try {
+      setIsLoadingStats(true);
       const chatbots = await fetchChatbots();
       
       // Fetch telegram stats for all chatbots
@@ -47,6 +50,8 @@ export default function DashboardPage() {
       });
     } catch (error) {
       console.error('Failed to load stats:', error);
+    } finally {
+      setIsLoadingStats(false);
     }
   };
 
@@ -97,127 +102,191 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Chatbots</CardTitle>
-              <Bot className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalChatbots}</div>
-              <p className="text-xs text-muted-foreground">
-                {stats.activeChatbots} active
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Chats</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalChats.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">
-                From all Telegram conversations
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Response Rate</CardTitle>
-              <BarChart3 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">--</div>
-              <p className="text-xs text-muted-foreground">
-                Coming soon
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        {isLoadingStats ? (
+          // Loading State
+          <>
+            {/* Stats Cards Skeleton */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {[1, 2, 3].map((i) => (
+                <Card key={i}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-4 rounded" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-8 w-16 mb-2" />
+                    <Skeleton className="h-3 w-20" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
 
-        {/* Quick Actions */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-foreground mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {quickActions.map((action) => {
-              const Icon = action.icon;
-              return (
-                <Link key={action.title} href={action.href}>
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            {/* Quick Actions Skeleton */}
+            <div className="mb-8">
+              <Skeleton className="h-8 w-32 mb-4" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <Card key={i}>
                     <CardContent className="p-6">
                       <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-lg ${action.color} flex items-center justify-center`}>
-                          <Icon size={24} />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-foreground">{action.title}</h3>
-                          <p className="text-sm text-muted-foreground">{action.description}</p>
+                        <Skeleton className="w-12 h-12 rounded-lg" />
+                        <div className="flex-1">
+                          <Skeleton className="h-5 w-24 mb-2" />
+                          <Skeleton className="h-4 w-32" />
                         </div>
                       </div>
                     </CardContent>
                   </Card>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
+                ))}
+              </div>
+            </div>
 
-        {/* Getting Started */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Getting Started</CardTitle>
-            <CardDescription>
-              Follow these steps to create your first chatbot
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-start gap-4">
-              <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
-                1
-              </div>
-              <div>
-                <h4 className="font-medium text-foreground">Create Your First Chatbot</h4>
-                <p className="text-sm text-muted-foreground mb-2">
-                  Set up a new chatbot with your preferred AI model and configuration.
-                </p>
-                <Link href="/dashboard/chatbots/create">
-                  <Button size="sm" className="gap-2">
-                    <Plus size={16} />
-                    Create Chatbot
-                  </Button>
-                </Link>
+            {/* Getting Started Skeleton */}
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-6 w-32 mb-2" />
+                <Skeleton className="h-4 w-64" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-start gap-4">
+                    <Skeleton className="w-6 h-6 rounded-full" />
+                    <div className="flex-1">
+                      <Skeleton className="h-5 w-40 mb-2" />
+                      <Skeleton className="h-4 w-full mb-2" />
+                      {i === 1 && <Skeleton className="h-9 w-32" />}
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </>
+        ) : (
+          // Actual Content
+          <>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Chatbots</CardTitle>
+                  <Bot className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalChatbots}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {stats.activeChatbots} active
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Chats</CardTitle>
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalChats.toLocaleString()}</div>
+                  <p className="text-xs text-muted-foreground">
+                    From all Telegram conversations
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Response Rate</CardTitle>
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">--</div>
+                  <p className="text-xs text-muted-foreground">
+                    Coming soon
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-foreground mb-4">Quick Actions</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {quickActions.map((action) => {
+                  const Icon = action.icon;
+                  return (
+                    <Link key={action.title} href={action.href}>
+                      <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                        <CardContent className="p-6">
+                          <div className="flex items-center gap-4">
+                            <div className={`w-12 h-12 rounded-lg ${action.color} flex items-center justify-center`}>
+                              <Icon size={24} />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-foreground">{action.title}</h3>
+                              <p className="text-sm text-muted-foreground">{action.description}</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
-            
-            <div className="flex items-start gap-4">
-              <div className="w-6 h-6 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm font-semibold">
-                2
-              </div>
-              <div>
-                <h4 className="font-medium text-muted-foreground">Add Knowledge Base</h4>
-                <p className="text-sm text-muted-foreground">
-                  Upload documents or add URLs to train your chatbot.
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-start gap-4">
-              <div className="w-6 h-6 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm font-semibold">
-                3
-              </div>
-              <div>
-                <h4 className="font-medium text-muted-foreground">Deploy & Share</h4>
-                <p className="text-sm text-muted-foreground">
-                  Test your chatbot and share it with your users.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+
+            {/* Getting Started */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Getting Started</CardTitle>
+                <CardDescription>
+                  Follow these steps to create your first chatbot
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
+                    1
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-foreground">Create Your First Chatbot</h4>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Set up a new chatbot with your preferred AI model and configuration.
+                    </p>
+                    <Link href="/dashboard/chatbots/create">
+                      <Button size="sm" className="gap-2">
+                        <Plus size={16} />
+                        Create Chatbot
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4">
+                  <div className="w-6 h-6 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm font-semibold">
+                    2
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-muted-foreground">Add Knowledge Base</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Upload documents or add URLs to train your chatbot.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4">
+                  <div className="w-6 h-6 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm font-semibold">
+                    3
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-muted-foreground">Deploy & Share</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Test your chatbot and share it with your users.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
     </div>
   );
