@@ -2,7 +2,16 @@
 
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
-import { Bot, User, Menu, X, LayoutDashboard, Settings } from 'lucide-react';
+import { Bot, User, Menu, X, LayoutDashboard, Settings, LogOut, ChevronUp } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 // Sidebar Context
 const SidebarContext = createContext<{
@@ -117,6 +126,7 @@ export function SidebarProvider({ children }: SidebarProviderProps) {
 // Sidebar Component
 export function Sidebar({ user }: { user: any }) {
   const { isOpen, close } = useContext(SidebarContext);
+  const router = useRouter();
 
   // Definisikan navItems di client component
   const navItems = [
@@ -125,11 +135,24 @@ export function Sidebar({ user }: { user: any }) {
     { name: 'Profile', href: '/dashboard/profile', icon: User },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ];
+  
   const handleNavClick = () => {
     // Close sidebar on mobile after navigation
     if (window.innerWidth < 1024) {
       close();
     }
+  };
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
+
+  // Truncate email if too long
+  const truncateEmail = (email: string, maxLength: number = 25) => {
+    if (email.length <= maxLength) return email;
+    return email.substring(0, maxLength) + '...';
   };
 
   return (
@@ -187,18 +210,56 @@ export function Sidebar({ user }: { user: any }) {
             })}
           </nav>
           
-          {/* User info */}
+          {/* User info with dropdown */}
           <div className="border-t border-border p-4">
-            <div className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <User className="h-4 w-4" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">
-                  {user.email}
-                </span>
-              </div>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-accent transition-colors group">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-primary/20 group-hover:bg-primary/20 transition-colors">
+                    <User className="h-4 w-4" />
+                  </div>
+                  <div className="flex flex-col flex-1 text-left overflow-hidden">
+                    <span className="text-xs text-muted-foreground">Logged in as</span>
+                    <span className="text-sm font-medium text-foreground truncate" title={user.email}>
+                      {truncateEmail(user.email)}
+                    </span>
+                  </div>
+                  <ChevronUp className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                align="end" 
+                side="top" 
+                className="w-56 mb-2"
+                sideOffset={5}
+              >
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium text-foreground">My Account</p>
+                  <p className="text-xs text-muted-foreground truncate" title={user.email}>
+                    {user.email}
+                  </p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link 
+                    href="/dashboard/profile" 
+                    className="cursor-pointer flex items-center"
+                    onClick={handleNavClick}
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={handleLogout}
+                  className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950/20"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </aside>
