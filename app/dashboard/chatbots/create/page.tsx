@@ -10,12 +10,15 @@ import ChatConfigStep from '@/components/wizard/chat-config-step';
 import PreviewPanel from '@/components/wizard/preview-panel';
 import { Button } from '@/components/ui/button';
 import { useChatbot } from '@/hooks/useChatbot';
+import { useRAGSystem } from '@/hooks/useRAGSystem';
 
 export default function CreateChatbotPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isCreating, setIsCreating] = useState(false);
+  const [chatbotId, setChatbotId] = useState<string | null>(null);
   const router = useRouter();
-  const { createChatbot, isLoading, error } = useChatbot();
+  const { createChatbot, updateChatbot, isLoading, error } = useChatbot();
+  const { getDocuments, rebuildVectorstore, getRAGStats, isLoading: isRAGLoading } = useRAGSystem();
   
   const [formData, setFormData] = useState({
     name: '',
@@ -39,8 +42,85 @@ export default function CreateChatbotPage() {
     { title: 'Configuration', icon: Circle },
   ];
 
-  const handleNext = () => {
-    if (currentStep < steps.length - 1) {
+  const handleNext = async () => {
+    if (!validateCurrentStep()) {
+      return;
+    }
+
+    // Create chatbot after step 1 (Basic Info)
+    if (currentStep === 0 && !chatbotId) {
+      setIsCreating(true);
+      try {
+        const result = await createChatbot({
+          ...formData,
+          status: 'draft' // Create as draft initially
+        });
+        
+        if (result.success && result.chatbot) {
+          setChatbotId(result.chatbot.id);
+          toast.success('Basic information saved!');
+          setCurrentStep(currentStep + 1);
+        } else {
+          toast.error(result.error || 'Failed to save chatbot');
+        }
+      } catch (error) {
+        console.error('Error creating chatbot:', error);
+        toast.error('An unexpected error occurred');
+      } finally {
+        setIsCreating(false);
+      }
+    } 
+    // Build vectorstore when moving from step 2 (Knowledge Base) to step 3 (Configuration)
+    else if (currentStep === 1 && chatbotId) {
+      setIsCreating(true);
+      try {
+        // Check if there are any documents uploaded
+        console.log('Checking documents for chatbot:', chatbotId);
+        const documents = await getDocuments(chatbotId);
+        console.log('Documents found:', documents.length, documents);
+        
+        if (documents.length > 0) {
+          toast.info('Building vectorstore for your knowledge base... This may take a few moments.');
+          
+          try {
+            const result = await rebuildVectorstore(chatbotId);
+            console.log('Vectorstore rebuild result:', result);
+            
+            if (result.documents_processed !== undefined) {
+              toast.success(
+                `Vectorstore built successfully! Processed ${result.documents_processed} documents in ${result.processing_time?.toFixed(1) || 0}s`
+              );
+            } else {
+              toast.success('Vectorstore built successfully!');
+            }
+            
+            // Verify vectorstore was created
+            const stats = await getRAGStats(chatbotId);
+            console.log('RAG Stats after rebuild:', stats);
+            
+            if (stats && stats.total_chunks > 0) {
+              toast.success(`Knowledge base ready with ${stats.total_chunks} chunks!`);
+            }
+          } catch (rebuildError) {
+            console.error('Error rebuilding vectorstore:', rebuildError);
+            toast.error('Failed to build vectorstore. You can rebuild it later from the dashboard.');
+          }
+        } else {
+          console.log('No documents uploaded, skipping vectorstore build');
+          toast.info('No documents uploaded. You can add documents later from the dashboard.');
+        }
+        
+        setCurrentStep(currentStep + 1);
+      } catch (error) {
+        console.error('Error in knowledge base validation:', error);
+        toast.error('An error occurred while validating knowledge base.');
+        // Still proceed to next step
+        setCurrentStep(currentStep + 1);
+      } finally {
+        setIsCreating(false);
+      }
+    } 
+    else if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -78,22 +158,31 @@ export default function CreateChatbotPage() {
       return;
     }
 
+    if (!chatbotId) {
+      toast.error('Chatbot ID not found. Please restart the creation process.');
+      return;
+    }
+
     setIsCreating(true);
     
     try {
       console.log('Form data being sent:', formData);
       console.log('Commands specifically:', formData.commands);
       
-      const result = await createChatbot(formData);
+      // Update chatbot with final configuration and set status to active
+      const result = await updateChatbot(chatbotId, {
+        ...formData,
+        status: 'active'
+      });
       
       if (result.success) {
         toast.success('Chatbot created successfully!');
         router.push('/dashboard/chatbots');
       } else {
-        toast.error(result.error || 'Failed to create chatbot');
+        toast.error(result.error || 'Failed to update chatbot');
       }
     } catch (error) {
-      console.error('Error creating chatbot:', error);
+      console.error('Error updating chatbot:', error);
       toast.error('An unexpected error occurred');
     } finally {
       setIsCreating(false);
@@ -105,7 +194,7 @@ export default function CreateChatbotPage() {
       case 0:
         return <BasicInfoStep data={formData} setData={setFormData} />;
       case 1:
-        return <KnowledgeBaseStep data={formData} setData={setFormData} />;
+        return <KnowledgeBaseStep data={formData} setData={setFormData} chatbotId={chatbotId} />;
       case 2:
         return <ChatConfigStep data={formData} setData={setFormData} />;
       default:
@@ -187,10 +276,19 @@ export default function CreateChatbotPage() {
               {currentStep < steps.length - 1 ? (
                 <Button 
                   onClick={handleNext} 
-                  disabled={!validateCurrentStep()} 
+                  disabled={isCreating || isLoading || isRAGLoading} 
                   className="px-6 bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
                 >
-                  Next <ChevronRight size={18} />
+                  {isCreating || isLoading || isRAGLoading ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      {currentStep === 1 ? 'Building Vectorstore...' : 'Saving...'}
+                    </>
+                  ) : (
+                    <>
+                      Next <ChevronRight size={18} />
+                    </>
+                  )}
                 </Button>
               ) : (
                 <Button

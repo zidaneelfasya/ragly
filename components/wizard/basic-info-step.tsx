@@ -51,19 +51,12 @@ export default function BasicInfoStep({ data, setData }: BasicInfoStepProps) {
           <Label htmlFor="model" className="text-base font-semibold mb-2 block">
             AI Model
           </Label>
-          <Select value={data.model} onValueChange={(value) => setData({ ...data, model: value })}>
-            <SelectTrigger id="model" className="bg-input border-border h-10">
-              <SelectValue />
+          <Select value={data.model} disabled>
+            <SelectTrigger id="model" className="bg-muted border-border h-10 cursor-not-allowed opacity-60">
+              <SelectValue>Google Gemini</SelectValue>
             </SelectTrigger>
-            <SelectContent>
-              {aiModels.map((model) => (
-                <SelectItem key={model.value} value={model.value}>
-                  {model.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
           </Select>
-          <p className="text-xs text-muted-foreground mt-1">Select your preferred AI model</p>
+          <p className="text-xs text-muted-foreground mt-1">Default AI model (cannot be changed)</p>
         </div>
 
         <div>
