@@ -11,6 +11,20 @@ RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+# Build arguments for NEXT_PUBLIC_* variables (required at build time)
+ARG NEXT_PUBLIC_SUPABASE_URL=dummy
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY=dummy
+ARG NEXT_PUBLIC_RAG_BASE_URL=dummy
+ARG NEXT_PUBLIC_LLM_SERVICE_URL=dummy
+ARG NEXT_PUBLIC_SITE_URL=dummy
+
+# Set environment variables from build args
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV NEXT_PUBLIC_RAG_BASE_URL=$NEXT_PUBLIC_RAG_BASE_URL
+ENV NEXT_PUBLIC_LLM_SERVICE_URL=$NEXT_PUBLIC_LLM_SERVICE_URL
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -19,7 +33,6 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Build the application
-# All NEXT_PUBLIC_* variables will be loaded at runtime from .env
 RUN npm run build
 
 # Stage 3: Runner

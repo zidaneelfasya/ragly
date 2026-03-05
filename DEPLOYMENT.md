@@ -346,6 +346,12 @@ Masuk ke repository GitHub: `https://github.com/zidaneelfasya/ragly`
 | `VPS_USERNAME` | `your-username` | SSH username VPS (misal: root atau ubuntu) |
 | `VPS_SSH_KEY` | `private-key-content` | Private SSH key untuk akses VPS |
 | `VPS_PORT` | `22` | SSH port (default: 22) |
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://xxx.supabase.co` | URL Supabase project |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `your-anon-key` | Supabase anon/public key |
+| `NEXT_PUBLIC_RAG_BASE_URL` | `http://your-rag:8000` | URL RAG service |
+| `NEXT_PUBLIC_LLM_SERVICE_URL` | `http://your-llm:8000` | URL LLM service |
+
+**⚠️ PENTING**: Environment variables `NEXT_PUBLIC_*` diperlukan saat build Docker image karena Next.js akan embed values tersebut ke dalam static files.
 
 ### 2. Verifikasi Workflow File
 

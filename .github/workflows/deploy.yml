@@ -48,6 +48,12 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ env.DOCKER_IMAGE_NAME }}:buildcache
           cache-to: type=registry,ref=${{ env.DOCKER_IMAGE_NAME }}:buildcache,mode=max
+          build-args: |
+            NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+            NEXT_PUBLIC_RAG_BASE_URL=${{ secrets.NEXT_PUBLIC_RAG_BASE_URL }}
+            NEXT_PUBLIC_LLM_SERVICE_URL=${{ secrets.NEXT_PUBLIC_LLM_SERVICE_URL }}
+            NEXT_PUBLIC_SITE_URL=https://ragly.ibpub.org
 
       - name: Image digest
         run: echo "Image pushed with digest ${{ steps.meta.outputs.digest }}"
