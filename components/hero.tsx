@@ -12,7 +12,7 @@ export default function Hero() {
           {/* Left Content */}
           <div className="flex flex-col justify-center">
             <div className="inline-block w-fit mb-4 px-4 py-2 bg-accent/10 border border-accent rounded-full">
-              <span className="text- text-sm font-medium">Build AI-Powered Chatbots</span>
+              <span className="text- text-sm font-medium">Build AI-Powered Chatbots fix</span>
             </div>
 
             <h1 className="text-5xl md:text-6xl font-bold leading-tight text-foreground mb-6">
