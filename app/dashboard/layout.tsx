@@ -16,7 +16,7 @@ export default async function DashboardLayout({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return redirect('/login');
+    return redirect('/auth/authentication');
   }
 
   // Hanya kirim data string ke client component

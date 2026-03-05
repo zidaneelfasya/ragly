@@ -6,6 +6,9 @@ import { AdminStatsCharts } from '@/components/admin/admin-stats-charts';
 import { RecentActivity } from '@/components/admin/recent-activity';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
 

@@ -11,6 +11,9 @@ import ChatHeader from "@/components/chat/chat-header"
 import { useChatHistory, useChatMessages, useCreateThread } from "@/hooks/useChat"
 import { createClient } from "@/lib/supabase/client"
 
+// Force dynamic rendering - don't pre-render this page at build time
+export const dynamic = 'force-dynamic'
+
 export default function ChatInterface() {
   const [selectedChat, setSelectedChat] = useState<string | null>(null)
   const [message, setMessage] = useState("")

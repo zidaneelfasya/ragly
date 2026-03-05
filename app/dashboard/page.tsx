@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useChatbot } from '@/hooks/useChatbot';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export default function DashboardPage() {
   const [stats, setStats] = useState({
     totalChatbots: 0,

@@ -2,6 +2,9 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { AdminUsersManagement } from '@/components/admin/admin-users-management';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export default async function AdminUsersPage() {
   const supabase = await createClient();
 
