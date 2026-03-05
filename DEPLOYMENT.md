@@ -306,7 +306,7 @@ sudo certbot renew --dry-run
 
 ```bash
 # Generate SSH key (di VPS)
-ssh-keygen -t ed25519 -C "github-actions@ragly" -f ~/.ssh/github_actions
+ssh-keygen -t ed25519 -C "github-actions@ragly" -f ~/.ssh/github_actions -N ""
 
 # Tampilkan public key
 cat ~/.ssh/github_actions.pub
@@ -314,15 +314,42 @@ cat ~/.ssh/github_actions.pub
 # Tambahkan public key ke authorized_keys
 cat ~/.ssh/github_actions.pub >> ~/.ssh/authorized_keys
 
-# Set permissions
-chmod 600 ~/.ssh/authorized_keys
+# Set permissions (CRITICAL!)
 chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/github_actions
+chmod 644 ~/.ssh/github_actions.pub
+
+# Enable PubkeyAuthentication in SSH config
+sudo sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+
+# Or manually edit
+# sudo nano /etc/ssh/sshd_config
+# Find: #PubkeyAuthentication yes
+# Change to: PubkeyAuthentication yes (remove #)
+
+# Verify SSH config
+sudo grep "^PubkeyAuthentication" /etc/ssh/sshd_config
+# Should output: PubkeyAuthentication yes
+
+# Restart SSH service (service name is 'ssh' not 'sshd' on Ubuntu/Debian)
+sudo systemctl restart ssh
+
+# Verify SSH service is running
+sudo systemctl status ssh
+
+# Test SSH config syntax
+sudo sshd -t
 
 # Tampilkan private key (untuk disimpan di GitHub Secrets)
+echo "=== Copy this ENTIRE private key to GitHub Secret VPS_SSH_KEY ==="
 cat ~/.ssh/github_actions
 ```
 
-**PENTING**: Simpan private key ini untuk GitHub Secrets!
+**⚠️ CRITICAL**: 
+1. Copy **ENTIRE** private key including `-----BEGIN` and `-----END` lines
+2. Make sure `PubkeyAuthentication yes` is uncommented in `/etc/ssh/sshd_config`
+3. Restart SSH service after changes
 
 ---
 
@@ -509,20 +536,53 @@ sudo systemctl reload nginx
 
 **Symptoms**: SSH connection timeout atau authentication failed
 
+**Error Message**: `ssh: unable to authenticate, attempted methods [none publickey], no supported methods remain`
+
 **Solution**:
 ```bash
-# Verify SSH key in GitHub Secrets
-# Make sure VPS_SSH_KEY contains the correct private key
+# 1. Check if PubkeyAuthentication is enabled (COMMON ISSUE!)
+sudo grep "^PubkeyAuthentication" /etc/ssh/sshd_config
 
-# Test SSH connection manually
-ssh -i path/to/private-key user@vps-ip
+# If output is empty or shows commented line, enable it:
+sudo sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
 
-# Check VPS firewall
+# 2. Verify the change
+sudo grep "^PubkeyAuthentication" /etc/ssh/sshd_config
+# Should output: PubkeyAuthentication yes (without #)
+
+# 3. Restart SSH service (service name is 'ssh' not 'sshd' on Ubuntu/Debian)
+sudo systemctl restart ssh
+
+# 4. Verify SSH service is running
+sudo systemctl status ssh
+
+# 5. Check authorized_keys permissions
+ls -la ~/.ssh/authorized_keys
+# Should be: -rw------- (600)
+
+# 6. Check .ssh directory permissions
+ls -la ~/.ssh/
+# Should be: drwx------ (700)
+
+# 7. Test SSH connection manually from local machine
+ssh -i path/to/private-key user@vps-ip -v
+
+# 8. Check VPS firewall
 sudo ufw status
 sudo ufw allow 22/tcp  # Allow SSH
 sudo ufw allow 80/tcp  # Allow HTTP
 sudo ufw allow 443/tcp # Allow HTTPS
+
+# 9. View SSH logs for debugging
+sudo tail -f /var/log/auth.log  # Ubuntu/Debian
 ```
+
+**Common Causes**:
+- ✅ PubkeyAuthentication is commented out in `/etc/ssh/sshd_config` (MOST COMMON)
+- ✅ Wrong file permissions on `.ssh/` or `authorized_keys`
+- ✅ Private key not properly copied to GitHub Secrets
+- ✅ SSH service not restarted after config changes
+- ✅ Wrong username in VPS_USERNAME secret
 
 ### Problem 2: Docker Build Failed
 
