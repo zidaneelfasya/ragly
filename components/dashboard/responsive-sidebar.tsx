@@ -146,7 +146,7 @@ export function Sidebar({ user }: { user: any }) {
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push('/login');
+    router.push('/');
   };
 
   // Truncate email if too long
