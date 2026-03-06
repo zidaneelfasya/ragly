@@ -39,6 +39,8 @@ import DeleteConfirmDialog from "@/components/delete-confirm-dialog";
 import KnowledgeBaseManager from "@/components/knowledge-base-manager";
 import TelegramStatsCard from "@/components/telegram-stats-card";
 import TelegramRecentActivity from "@/components/telegram-recent-activity";
+import ChatbotTesterDialog from "@/components/chatbot-tester-dialog";
+import EmbedCodeGenerator from "@/components/embed-code-generator";
 
 export default function ChatbotDetailPage() {
 	const params = useParams();
@@ -53,6 +55,7 @@ export default function ChatbotDetailPage() {
 	const [telegramBotCreated, setTelegramBotCreated] = useState(false);
 	const [existingTelegramBot, setExistingTelegramBot] = useState<any>(null);
 	const [telegramStats, setTelegramStats] = useState<any>(null);
+	const [isTesterDialogOpen, setIsTesterDialogOpen] = useState(false);
 	const { fetchChatbot, deleteChatbot, isLoading } = useChatbot();
 
 	useEffect(() => {
@@ -61,6 +64,7 @@ export default function ChatbotDetailPage() {
 		}
 	}, [chatbotId]);
 
+	
 	const loadChatbot = async () => {
 		try {
 			const data = await fetchChatbot(chatbotId);
@@ -327,7 +331,7 @@ export default function ChatbotDetailPage() {
 							<Button variant="destructive" size="sm" className="flex-shrink-0">
 								<Trash2 size={16} className="sm:mr-2" />
 								<span className="hidden sm:inline">Delete</span>
-								</Button>	
+								</Button>
 						</DeleteConfirmDialog>
 						</div>
 					</div>
@@ -553,11 +557,20 @@ export default function ChatbotDetailPage() {
 						{/* Knowledge Base */}
 						<KnowledgeBaseManager chatbotId={chatbot.id} />
 
+						{/* Embed Code Generator */}
+						
+
 						{/* Telegram Statistics - Show only if bot is created */}
 						{telegramBotCreated && existingTelegramBot && (
 							<TelegramStatsCard chatbotId={chatbot.id} />
 						)}
+						<EmbedCodeGenerator 
+							chatbotId={chatbot.id} 
+							chatbotName={chatbot.name}
+						/>
+						
 					</div>
+					
 
 					{/* Right Column - Stats and Actions */}
 					<div className="space-y-6">
@@ -567,9 +580,13 @@ export default function ChatbotDetailPage() {
 								<CardTitle>Quick Actions</CardTitle>
 							</CardHeader>
 							<CardContent className="space-y-3">
-								<Button className="w-full" size="sm">
-									<MessageSquare size={16} className="mr-2" />
-									Test Chat
+							<Button 
+								className="w-full" 
+								size="sm"
+								onClick={() => setIsTesterDialogOpen(true)}
+							>
+								<MessageSquare size={16} className="mr-2" />
+								Coba Chatbot
 								</Button>
 								<Button variant="outline" className="w-full" size="sm">
 									<Activity size={16} className="mr-2" />
@@ -830,6 +847,17 @@ export default function ChatbotDetailPage() {
 					</div>
 				</div>
 			</div>
+
+			{/* Chatbot Tester Dialog */}
+			{chatbot && (
+				<ChatbotTesterDialog
+					chatbotId={chatbot.id}
+					chatbotName={chatbot.name}
+					chatbotPersonality={chatbot.personality}
+					open={isTesterDialogOpen}
+					onOpenChange={setIsTesterDialogOpen}
+				/>
+			)}
 		</div>
 	);
 }
