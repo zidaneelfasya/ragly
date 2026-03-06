@@ -125,7 +125,7 @@ export function SignUpForm({
 			{/* Tab Toggle */}
 			<div className="flex rounded-full bg-muted p-1 mb-4">
 				<Link
-					href="/auth/"
+					href="/auth/authentication"
 					className="flex-1 py-2.5 px-4 rounded-full text-muted-foreground font-medium text-center hover:text-foreground transition-all"
 				>
 					LOGIN
