@@ -1,5 +1,14 @@
+// File ini untuk menggantikan atau mengupdate route.ts yang ada di:
+// app/api/chatbots/[id]/telegram/route.ts
+//
+// Perubahan utama: webhook URL akan mengarah ke Express service di VPS
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+
+// URL Express service yang berjalan di VPS
+// Ini adalah URL yang akan di-set sebagai webhook di Telegram
+const TELEGRAM_WEBHOOK_SERVICE_URL = process.env.TELEGRAM_WEBHOOK_SERVICE_URL || 'http://localhost:3001';
 
 export async function POST(
   request: NextRequest,
@@ -74,8 +83,14 @@ export async function POST(
       }, { status: 500 });
     }
 
-    // Set up webhook URL
-    const webhookUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://1284aa66cc28.ngrok-free.app'}/api/telegram/webhook/${chatbotId}`;
+    // ========================================
+    // IMPORTANT: Webhook URL now points to Express service on VPS
+    // ========================================
+    const webhookUrl = `${TELEGRAM_WEBHOOK_SERVICE_URL}/webhook/${chatbotId}`;
+    
+    console.log('🔧 Setting up Telegram webhook');
+    console.log(`  - Webhook URL: ${webhookUrl}`);
+    console.log(`  - Chatbot ID: ${chatbotId}`);
     
     try {
       const webhookResponse = await fetch(`https://api.telegram.org/bot${botToken}/setWebhook`, {
@@ -97,6 +112,8 @@ export async function POST(
           error: 'Failed to set up Telegram webhook' 
         }, { status: 500 });
       }
+
+      console.log('✅ Webhook configured successfully');
 
     } catch (webhookError) {
       console.error('Webhook setup error:', webhookError);
@@ -153,6 +170,7 @@ export async function POST(
       message: 'Telegram bot created successfully',
       webhookUrl,
       botUsername,
+      note: 'Webhook is now pointing to dedicated Express service on VPS'
     });
 
   } catch (error) {

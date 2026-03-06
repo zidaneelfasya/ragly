@@ -2,9 +2,21 @@ version: '3.8'
 
 services:
   ragly-app:
-    # Replace with your actual Docker Hub image
-    # Format: dockerhub-username/image-name:tag
+    # Option 1: Use pre-built image from Docker Hub
     image: zidaneelfasya/ragly-app:latest
+    
+    # Option 2: Build locally with environment variables
+    # Uncomment the build section below and comment out the image line above
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    #   args:
+    #     NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+    #     NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+    #     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY}
+    #     NEXT_PUBLIC_RAG_BASE_URL: ${NEXT_PUBLIC_RAG_BASE_URL}
+    #     NEXT_PUBLIC_LLM_SERVICE_URL: ${NEXT_PUBLIC_LLM_SERVICE_URL}
+    #     NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
     
     container_name: ragly-app
     
@@ -14,6 +26,7 @@ services:
       - "3000:3000"
     
     # Load environment variables from .env file
+    # Note: NEXT_PUBLIC_* variables must be set at BUILD time, not runtime
     env_file:
       - .env
     

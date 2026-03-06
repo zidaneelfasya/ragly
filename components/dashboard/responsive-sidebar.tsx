@@ -179,7 +179,7 @@ export function Sidebar({ user }: { user: any }) {
           {/* Logo */}
           <div className="flex h-16 items-center justify-between border-b border-border px-6">
             <Link href="/dashboard" className="flex items-center gap-2" onClick={handleNavClick}>
-              <Bot className="h-8 w-8 text-primary" />
+              {/* <Bot className="h-8 w-8 text-primary" /> */}
               <span className="text-lg font-bold text-foreground">Ragly</span>
             </Link>
             
