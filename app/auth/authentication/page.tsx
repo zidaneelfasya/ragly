@@ -99,8 +99,45 @@ export default function AuthenticationPage() {
     }
   };
 
-    const handleGoogleAuth = () => {
-      console.log(`Google ${activeTab}`);
+const handleGoogleAuth = async () => {
+    const supabase = createClient();
+    
+    // Set loading state based on active tab
+    if (activeTab === "login") {
+      setLoginLoading(true);
+      setLoginError(null);
+    } else {
+      setSignupLoading(true);
+      setSignupError(null);
+    }
+    
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+      
+      if (error) throw error;
+      
+      // Redirect will happen automatically via OAuth flow
+    } catch (error: unknown) {
+      console.error("Error signing in with Google:", error);
+      const errorMessage = error instanceof Error ? error.message : "An error occurred with Google Login";
+      
+      if (activeTab === "login") {
+        setLoginError(errorMessage);
+        setLoginLoading(false);
+      } else {
+        setSignupError(errorMessage);
+        setSignupLoading(false);
+      }
+    }
     };
 
     const handleFacebookAuth = () => {
@@ -346,6 +383,7 @@ export default function AuthenticationPage() {
                 variant="outline"
                 className="flex-1 h-11 gap-2"
                 onClick={handleGoogleAuth}
+                disabled={loginLoading || signupLoading}
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
@@ -365,6 +403,7 @@ export default function AuthenticationPage() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
+                {(loginLoading || signupLoading) ? "Connecting..." : "Google"}
                 Google
               </Button>
               {/* <Button
