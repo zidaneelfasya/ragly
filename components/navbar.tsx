@@ -155,7 +155,7 @@ export default function Navbar() {
                   Sign In
                 </Link>
                 <Link
-                  href="/signup"
+                  href="/dashboard"
                   className="px-6 py-2 bg-primary text-primary-foreground rounded-full hover:bg-opacity-90 transition font-medium"
                 >
                   Get Started
@@ -234,11 +234,11 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="pt-4 flex flex-col gap-2">
-                <Link href="/auth/login" className="text-center py-2 text-foreground hover:text-primary">
+                <Link href="/auth/authentication" className="text-center py-2 text-foreground hover:text-primary">
                   Sign In
                 </Link>
                 <Link
-                  href="/signup"
+                  href="/auth/authentication"
                   className="text-center py-2 bg-primary text-primary-foreground rounded-full hover:bg-opacity-90 transition"
                 >
                   Get Started
