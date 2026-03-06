@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ragly Chatbot Widget Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      background: white;
+      border-radius: 20px;
+      padding: 60px 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #1a202c;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 1.25rem;
+      color: #4a5568;
+      margin-bottom: 2rem;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+      text-align: left;
+    }
+
+    .feature {
+      padding: 1.5rem;
+      background: #f7fafc;
+      border-radius: 12px;
+      border: 2px solid #e2e8f0;
+    }
+
+    .feature h3 {
+      color: #667eea;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .feature p {
+      color: #718096;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .cta {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1rem 2.5rem;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+    }
+
+    .demo-note {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: #fef5e7;
+      border-left: 4px solid #f59e0b;
+      border-radius: 8px;
+      text-align: left;
+    }
+
+    .demo-note h4 {
+      color: #d97706;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .demo-note p {
+      color: #92400e;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .demo-note code {
+      background: white;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      color: #be185d;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 40px 20px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .subtitle {
+        font-size: 1rem;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🤖 Ragly Chatbot Widget</h1>
+    <p class="subtitle">Experience our AI-powered chatbot in action</p>
+
+    <div class="features">
+      <div class="feature">
+        <h3>💬 Real-time Chat</h3>
+        <p>Get instant responses powered by advanced AI technology</p>
+      </div>
+      <div class="feature">
+        <h3>🎨 Customizable</h3>
+        <p>Match your brand with custom colors and positioning</p>
+      </div>
+      <div class="feature">
+        <h3>📱 Responsive</h3>
+        <p>Works perfectly on desktop, tablet, and mobile devices</p>
+      </div>
+      <div class="feature">
+        <h3>⚡ Fast & Light</h3>
+        <p>Minimal impact on your website's loading speed</p>
+      </div>
+    </div>
+
+    <button class="cta" onclick="alert('Click the chat button in the bottom-right corner! 👉')">
+      Try the Chatbot
+    </button>
+
+    <div class="demo-note">
+      <h4>📋 Demo Instructions</h4>
+      <p>
+        <strong>To test this widget on your own website:</strong><br><br>
+        1. Replace <code>YOUR_CHATBOT_ID</code> in the script below with your actual chatbot ID<br>
+        2. Copy the entire script tag<br>
+        3. Paste it before the closing <code>&lt;/body&gt;</code> tag in your HTML<br>
+        4. Customize colors, position, and size as needed
+      </p>
+    </div>
+  </div>
+
+  <!-- Ragly Chatbot Widget -->
+  <!-- IMPORTANT: Replace 'YOUR_CHATBOT_ID' with your actual chatbot ID from dashboard -->
+  <script>
+    // Configuration - Customize these values
+    window.RAGLY_CHATBOT_ID = 'YOUR_CHATBOT_ID'; // ⚠️ REPLACE THIS
+    window.RAGLY_POSITION = 'bottom-right'; // Options: 'bottom-right', 'bottom-left'
+    window.RAGLY_PRIMARY_COLOR = '#4F46E5'; // Any hex color
+    window.RAGLY_BUTTON_SIZE = '60px'; // Button size (e.g., '60px', '70px')
+  </script>
+  <script src="/widget/chatbot-widget.js"></script>
+</body>
+</html>
