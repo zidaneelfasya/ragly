@@ -284,50 +284,51 @@ export default function ChatbotDetailPage() {
 		<div className="min-h-screen bg-background">
 			{/* Header */}
 			<div className="border-b border-border bg-card">
-				<div className="max-w-7xl mr-auto px-4 py-6">
-					<div className="flex items-center justify-between">
-						<div className="flex items-center gap-2">
-							<Link href="/dashboard/chatbots">
-								<Button variant="ghost" size="sm">
-									<ArrowLeft size={16} className="" />
-									Back
-								</Button>
-							</Link>
-							<div className="flex items-center gap-3">
-								<div className="w-12 h-12 rounded-lg bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
-									<Bot size={24} className="text-primary-foreground" />
-								</div>
-								<div>
-									<h1 className="text-3xl font-bold text-foreground">
-										{chatbot.name}
-									</h1>
-									<p className="text-muted-foreground">
-										{chatbot.model} • Created {formatDate(chatbot.created_at)}
-									</p>
-								</div>
+			<div className="max-w-7xl mr-auto px-4 py-4 md:py-6">
+				<div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+					<div className="flex items-center gap-2 flex-wrap">
+						<Link href="/dashboard/chatbots">
+							<Button variant="ghost" size="sm">
+								<ArrowLeft size={16} className="" />
+								<span className="hidden sm:inline">Back</span>
+							</Button>
+						</Link>
+						<div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+							<div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-r from-primary to-secondary flex items-center justify-center flex-shrink-0">
+								<Bot size={20} className="sm:hidden text-primary-foreground" />
+								<Bot size={24} className="hidden sm:block text-primary-foreground" />
+							</div>
+							<div className="min-w-0 flex-1">
+								<h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground truncate">
+									{chatbot.name}
+								</h1>
+								<p className="text-xs sm:text-sm text-muted-foreground truncate">
+									{chatbot.model} • Created {formatDate(chatbot.created_at)}
+								</p>
 							</div>
 						</div>
-						<div className="flex items-center gap-3">
-							<Badge className={getStatusColor(chatbot.status)}>
-								{chatbot.status}
-							</Badge>
-							<Link href={`/dashboard/chatbots/edit/${chatbot.id}`}>
-								<Button variant="outline">
-									<Edit size={16} className="mr-2" />
-									Edit
-								</Button>
-							</Link>
-							<DeleteConfirmDialog
-								title="Delete Chatbot"
-								description={`This will permanently delete "${chatbot.name}" and all its data. This action cannot be undone.`}
-								onConfirm={handleDeleteChatbot}
-								isLoading={deletingChatbot}
-							>
-								<Button variant="destructive">
-									<Trash2 size={16} className="mr-2" />
-									Delete
-								</Button>
-							</DeleteConfirmDialog>
+					</div>
+					<div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+						<Badge className={`${getStatusColor(chatbot.status)} flex-shrink-0`}>
+							{chatbot.status}
+						</Badge>
+						<Link href={`/dashboard/chatbots/edit/${chatbot.id}`} className="flex-shrink-0">
+							<Button variant="outline" size="sm">
+								<Edit size={16} className="sm:mr-2" />
+								<span className="hidden sm:inline">Edit</span>
+							</Button>
+						</Link>
+						<DeleteConfirmDialog
+							title="Delete Chatbot"
+							description={`This will permanently delete "${chatbot.name}" and all its data. This action cannot be undone.`}
+							onConfirm={handleDeleteChatbot}
+							isLoading={deletingChatbot}
+						>
+							<Button variant="destructive" size="sm" className="flex-shrink-0">
+								<Trash2 size={16} className="sm:mr-2" />
+								<span className="hidden sm:inline">Delete</span>
+								</Button>	
+						</DeleteConfirmDialog>
 						</div>
 					</div>
 				</div>
