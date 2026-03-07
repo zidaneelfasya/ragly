@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono, Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "sonner"
+import { ThemeProvider } from "next-themes"
 import "./globals.css"
 
 const _geist = Geist({ subsets: ["latin"] })
@@ -39,10 +40,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} font-sans antialiased`}>
-        {children}
-        <Toaster richColors position="top-right" />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <Toaster richColors position="top-right" />
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>

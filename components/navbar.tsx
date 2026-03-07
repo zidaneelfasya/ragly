@@ -7,6 +7,7 @@ import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
+import { ThemeSwitcher } from "@/components/theme-switcher"
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -94,6 +95,7 @@ export default function Navbar() {
 
           {/* CTA Buttons or User Menu */}
           <div className="hidden md:flex items-center gap-4">
+            <ThemeSwitcher />
             {user ? (
               <div className="relative">
                 <button
@@ -198,8 +200,16 @@ export default function Navbar() {
               Docs
             </Link>
             
+            {/* Theme Switcher */}
+            <div className="pt-4 pb-2 border-t border-border mt-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Theme</span>
+                <ThemeSwitcher />
+              </div>
+            </div>
+            
             {user ? (
-              <div className="pt-4 flex flex-col gap-2 border-t border-border mt-2">
+              <div className="pt-4 flex flex-col gap-2 border-t border-border">
                 <Link 
                   href="/dashboard" 
                   onClick={() => setIsOpen(false)}

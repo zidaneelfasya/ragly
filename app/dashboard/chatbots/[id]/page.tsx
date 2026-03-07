@@ -697,10 +697,10 @@ export default function ChatbotDetailPage() {
 									</>
 								) : (
 									<div className="text-center py-4">
-										<div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-											<CheckCircle size={24} className="text-green-600" />
+										<div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+											<CheckCircle size={24} className="text-green-600 dark:text-green-400" />
 										</div>
-										<h4 className="font-semibold text-green-700 mb-2">
+										<h4 className="font-semibold text-green-700 dark:text-green-300 mb-2">
 											Telegram Bot Active!
 										</h4>
 										{existingTelegramBot && (
@@ -732,9 +732,9 @@ export default function ChatbotDetailPage() {
 												</p>
 											</div>
 
-											<div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-												<h5 className="text-sm font-medium text-blue-800 mb-1">How to test:</h5>
-												<ul className="text-xs text-blue-700 space-y-1">
+												<div className="p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+													<h5 className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-1">How to test:</h5>
+													<ul className="text-xs text-blue-700 dark:text-blue-400 space-y-1">
 													<li>• Search for your bot on Telegram</li>
 													<li>• Send /start to begin conversation</li>
 													<li>• Ask questions related to your knowledge base</li>

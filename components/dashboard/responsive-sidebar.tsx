@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { Bot, User, Menu, X, LayoutDashboard, Settings, LogOut, ChevronUp } from 'lucide-react';
+import { ThemeSwitcher } from '@/components/theme-switcher';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -209,6 +210,14 @@ export function Sidebar({ user }: { user: any }) {
               );
             })}
           </nav>
+          
+          {/* Theme Switcher */}
+          <div className="px-4 pb-3">
+            <div className="flex items-center justify-between gap-3 px-3 py-2">
+              <span className="text-sm text-muted-foreground">Theme</span>
+              <ThemeSwitcher />
+            </div>
+          </div>
           
           {/* User info with dropdown */}
           <div className="border-t border-border p-4">
