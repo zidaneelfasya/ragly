@@ -1,7 +1,17 @@
+/**
+ * Embed Code Generator Component
+ * 
+ * Komponen ini memungkinkan pengguna untuk:
+ * 1. Generate kode embed untuk HTML, React, dan WordPress
+ * 2. Customize appearance widget (posisi, warna, ukuran)
+ * 3. Preview langsung dengan tombol "Terapkan di Halaman Ini"
+ * 4. Widget akan otomatis update ketika konfigurasi diubah
+ */
+
 'use client';
 
-import { useState } from 'react';
-import { Copy, Check, Code, Globe, Palette } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Copy, Check, Code, Globe, Palette, Play, X } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -32,8 +42,97 @@ export default function EmbedCodeGenerator({ chatbotId, chatbotName }: EmbedCode
   const [position, setPosition] = useState('bottom-right');
   const [primaryColor, setPrimaryColor] = useState('#4F46E5');
   const [buttonSize, setButtonSize] = useState('60');
+  const [isWidgetActive, setIsWidgetActive] = useState(false);
 
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+
+  // Cleanup widget on unmount
+  useEffect(() => {
+    return () => {
+      if (isWidgetActive) {
+        const widget = document.getElementById('ragly-widget');
+        if (widget) widget.remove();
+        const script = document.getElementById('ragly-widget-script');
+        if (script) script.remove();
+      }
+    };
+  }, []);
+
+  // Update widget when configuration changes
+  useEffect(() => {
+    if (isWidgetActive) {
+      // Reload widget with new configuration
+      activateWidget();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [position, primaryColor, buttonSize]);
+
+  // Function to load and activate widget
+  const activateWidget = () => {
+    try {
+      // Set configuration
+      (window as any).RAGLY_CHATBOT_ID = chatbotId;
+      (window as any).RAGLY_POSITION = position;
+      (window as any).RAGLY_PRIMARY_COLOR = primaryColor;
+      (window as any).RAGLY_BUTTON_SIZE = `${buttonSize}px`;
+
+      // Remove existing widget if any
+      const existingWidget = document.getElementById('ragly-widget');
+      if (existingWidget) {
+        existingWidget.remove();
+      }
+      const existingScript = document.getElementById('ragly-widget-script');
+      if (existingScript) {
+        existingScript.remove();
+      }
+
+      // Load widget script
+      const script = document.createElement('script');
+      script.id = 'ragly-widget-script';
+      script.src = `${baseUrl}/widget/chatbot-widget.js`;
+      script.async = true;
+      script.onload = () => {
+        if (!isWidgetActive) {
+          toast.success('Widget chatbot berhasil diterapkan!');
+        }
+        setIsWidgetActive(true);
+      };
+      script.onerror = () => {
+        toast.error('Gagal memuat widget. Pastikan file widget tersedia.');
+        setIsWidgetActive(false);
+      };
+      document.body.appendChild(script);
+    } catch (error) {
+      console.error('Error activating widget:', error);
+      toast.error('Terjadi kesalahan saat mengaktifkan widget');
+    }
+  };
+
+  // Function to remove widget
+  const removeWidget = (showToast = true) => {
+    // Remove widget element
+    const widget = document.getElementById('ragly-widget');
+    if (widget) {
+      widget.remove();
+    }
+
+    // Remove script
+    const script = document.getElementById('ragly-widget-script');
+    if (script) {
+      script.remove();
+    }
+
+    // Clear window properties
+    delete (window as any).RAGLY_CHATBOT_ID;
+    delete (window as any).RAGLY_POSITION;
+    delete (window as any).RAGLY_PRIMARY_COLOR;
+    delete (window as any).RAGLY_BUTTON_SIZE;
+
+    setIsWidgetActive(false);
+    if (showToast) {
+      toast.info('Widget chatbot dinonaktifkan');
+    }
+  };
 
   // Generate embed code
   const generateEmbedCode = () => {
@@ -127,7 +226,44 @@ function App() {
       <CardContent className="space-y-6">
         {/* Customization Options */}
         <div className="space-y-4">
-          <h3 className="font-semibold text-sm">Customize Widget</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-sm">Customize Widget</h3>
+            
+            {/* Terapkan Button */}
+            <Button
+              size="sm"
+              variant={isWidgetActive ? "destructive" : "default"}
+              onClick={() => {
+                if (isWidgetActive) {
+                  removeWidget();
+                } else {
+                  activateWidget();
+                }
+              }}
+              className="gap-2"
+            >
+              {isWidgetActive ? (
+                <>
+                  <X size={16} />
+                  Nonaktifkan
+                </>
+              ) : (
+                <>
+                  <Play size={16} />
+                  Terapkan di Halaman Ini
+                </>
+              )}
+            </Button>
+          </div>
+          
+          {/* Active Widget Notice */}
+          {isWidgetActive && (
+            <div className="p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
+              <p className="text-xs text-green-800 dark:text-green-200">
+                ✅ Widget chatbot sedang aktif di halaman ini. Lihat di pojok kanan bawah!
+              </p>
+            </div>
+          )}
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Position */}
@@ -293,13 +429,13 @@ function App() {
         {/* Quick Info */}
         <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
           <h4 className="font-medium text-sm text-blue-900 dark:text-blue-100 mb-2">
-            📌 Quick Setup Guide
+            📌 Cara Menggunakan Widget
           </h4>
-          <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
-            <li>1. Customize the widget appearance above</li>
-            <li>2. Copy the code for your platform (HTML/React/WordPress)</li>
-            <li>3. Paste the code into your website</li>
-            <li>4. The chatbot widget will appear automatically! 🎉</li>
+          <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1.5">
+            <li>• <strong>Preview Langsung:</strong> Klik "Terapkan di Halaman Ini" untuk test widget di halaman ini</li>
+            <li>• <strong>Kustomisasi:</strong> Ubah posisi, warna, dan ukuran sesuai kebutuhan</li>
+            <li>• <strong>Copy Code:</strong> Salin kode untuk HTML/React/WordPress</li>
+            <li>• <strong>Pasang:</strong> Tempelkan kode ke website Anda dan widget siap digunakan! 🎉</li>
           </ul>
         </div>
       </CardContent>

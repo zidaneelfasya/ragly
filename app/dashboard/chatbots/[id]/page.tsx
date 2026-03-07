@@ -557,13 +557,14 @@ export default function ChatbotDetailPage() {
 						{/* Knowledge Base */}
 						<KnowledgeBaseManager chatbotId={chatbot.id} />
 
-						{/* Embed Code Generator */}
 						
 
 						{/* Telegram Statistics - Show only if bot is created */}
 						{telegramBotCreated && existingTelegramBot && (
 							<TelegramStatsCard chatbotId={chatbot.id} />
 						)}
+						{/* Embed Code Generator */}
+
 						<EmbedCodeGenerator 
 							chatbotId={chatbot.id} 
 							chatbotName={chatbot.name}
