@@ -122,7 +122,7 @@ export default function Navbar() {
                         <span>Dashboard</span>
                       </Link>
                       <Link
-                        href="/chat"
+                        href="/dashboard/chatbots"
                         onClick={() => setIsUserMenuOpen(false)}
                         className="flex items-center gap-3 px-4 py-2.5 hover:bg-accent transition"
                       >
@@ -209,7 +209,7 @@ export default function Navbar() {
                   <span>Dashboard</span>
                 </Link>
                 <Link 
-                  href="/chat" 
+                  href="/dashboard/chatbots" 
                   onClick={() => setIsOpen(false)}
                   className="flex items-center gap-3 py-2 text-foreground hover:text-primary"
                 >
