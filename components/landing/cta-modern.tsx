@@ -114,25 +114,25 @@ export default function CTAModern() {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.7 }}
-            className="mt-16 grid grid-cols-3 gap-8 max-w-3xl mx-auto"
+            className="mt-16 grid grid-cols-3 gap-3 sm:gap-6 md:gap-8 max-w-3xl mx-auto"
           >
-            <div className="p-6 rounded-2xl bg-background/50 backdrop-blur-sm border border-border/50">
-              <div className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-2">
+            <div className="p-3 sm:p-5 md:p-6 rounded-2xl bg-background/50 backdrop-blur-sm border border-border/50">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-1 sm:mb-2 truncate">
                 <CounterStat value="50K+" />
               </div>
-              <div className="text-sm text-muted-foreground">Happy Users</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Happy Users</div>
             </div>
-            <div className="p-6 rounded-2xl bg-background/50 backdrop-blur-sm border border-border/50">
-              <div className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-2">
+            <div className="p-3 sm:p-5 md:p-6 rounded-2xl bg-background/50 backdrop-blur-sm border border-border/50">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-1 sm:mb-2 truncate">
                 <CounterStat value="2M+" />
               </div>
-              <div className="text-sm text-muted-foreground">Conversations</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Conversations</div>
             </div>
-            <div className="p-6 rounded-2xl bg-background/50 backdrop-blur-sm border border-border/50">
-              <div className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-2">
+            <div className="p-3 sm:p-5 md:p-6 rounded-2xl bg-background/50 backdrop-blur-sm border border-border/50">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-1 sm:mb-2 truncate">
                 <CounterStat value="98.5%" />
               </div>
-              <div className="text-sm text-muted-foreground">Satisfaction</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Satisfaction</div>
             </div>
           </motion.div>
         </motion.div>

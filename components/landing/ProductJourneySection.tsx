@@ -40,6 +40,7 @@ export default function ProductJourneySection() {
   // then derive width from video height * (16/9) to preserve aspect ratio.
   useEffect(() => {
     const updateCardDims = () => {
+      if (window.innerWidth < 768) return; // skip on mobile
       const vh = window.innerHeight;
       const chromeBarH = 44; // approx browser-chrome bar inside the card
       // Reserved space: pt-16(64) + pb-12(48) + header(~116) + track margins mt-6+mb-8(56) + timeline(~50) + buffer(26)
@@ -84,6 +85,7 @@ export default function ProductJourneySection() {
   // correctly even when a parent element has overflow:hidden.
   useEffect(() => {
     const handleScroll = () => {
+      if (window.innerWidth < 768) return; // skip on mobile
       if (!sectionRef.current || !containerRef.current || !trackRef.current) return;
 
       const section = sectionRef.current;
@@ -165,13 +167,13 @@ export default function ProductJourneySection() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-[400vh] bg-transparent"
+      className="relative md:h-[400vh] bg-transparent"
       aria-label="Product Journey"
     >
-      {/* Sticky Container – position is managed by the scroll handler above */}
+      {/* Desktop Sticky Container – hidden on mobile, position managed by the scroll handler */}
       <div
         ref={containerRef}
-        className="h-screen overflow-hidden flex flex-col justify-between pt-16 pb-8 md:pb-12 left-0 w-full"
+        className="hidden md:flex h-screen overflow-hidden flex-col justify-between pt-16 pb-8 md:pb-12 left-0 w-full"
         style={{ position: 'absolute', top: 0 }}
       >
         
@@ -257,24 +259,55 @@ export default function ProductJourneySection() {
         </div>
       </div>
 
-      {/* Mobile Version - Vertical Stack purely displaying elements appropriately */}
-      <div className="md:hidden absolute inset-0 pt-32 pb-16 px-4 flex flex-col gap-16 overflow-y-auto">
-        {steps.map((step, index) => (
-          <div key={index} className="w-full relative">
-            <div className="mb-6 space-y-2 text-center">
-              <div className="inline-flex w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 items-center justify-center text-white font-bold text-sm mb-2 shadow-lg shadow-blue-500/30">
-                {index + 1}
+      {/* ─── Mobile Version ───────────────────────────────────────────────────
+           Normal document flow: section height is auto on mobile so it
+           naturally grows to fit all steps. No absolute/fixed positioning. */}
+      <div className="md:hidden w-full px-4 pt-24 pb-16 flex flex-col">
+
+        {/* Section header */}
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold text-foreground tracking-tight">
+            See How It Works
+          </h2>
+          <p className="text-base text-muted-foreground mt-3 max-w-xs mx-auto leading-relaxed">
+            Our AI chatbot platform in three simple steps
+          </p>
+        </div>
+
+        {/* Steps */}
+        <div className="flex flex-col gap-12">
+          {steps.map((step, index) => (
+            <div key={index} className="flex flex-col gap-4">
+
+              {/* Step badge + text */}
+              <div className="flex items-start gap-4">
+                {/* Number badge */}
+                <div className="flex-shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-500/30">
+                  {index + 1}
+                </div>
+                {/* Title + description */}
+                <div className="pt-0.5">
+                  <h3 className="text-lg font-semibold text-foreground leading-snug">
+                    {step.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                    {step.description}
+                  </p>
+                </div>
               </div>
-              <h3 className="text-2xl font-bold text-foreground">
-                {step.title}
-              </h3>
-              <p className="text-muted-foreground text-sm">
-                {step.description}
-              </p>
+
+              {/* Video mockup card */}
+              <MobileBrowserCard step={step} index={index} />
+
+              {/* Step divider (not after last item) */}
+              {index < steps.length - 1 && (
+                <div className="flex items-center gap-3 pt-2">
+                  <div className="flex-1 h-px bg-border" />
+                </div>
+              )}
             </div>
-            <MobileBrowserCard step={step} index={index} />
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

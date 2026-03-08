@@ -326,15 +326,15 @@ export default function KnowledgeBaseManager({ chatbotId }: KnowledgeBaseManager
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium">Uploaded Documents</h3>
-                <div className="flex gap-2">
+                <div className="flex gap-2 shrink-0">
                   <Button 
                     variant="outline" 
                     size="sm"
                     onClick={handleRefresh}
                     disabled={isLoading}
                   >
-                    <RefreshCw size={16} className={`mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                    Refresh
+                    <RefreshCw size={16} className={`sm:mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                    <span className="hidden sm:inline">Refresh</span>
                   </Button>
                   <DeleteConfirmDialog
                     title="Rebuild Vector Index"
@@ -349,8 +349,8 @@ export default function KnowledgeBaseManager({ chatbotId }: KnowledgeBaseManager
                       size="sm"
                       disabled={isLoading}
                     >
-                      <Database size={16} className={`mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                      Rebuild Index
+                      <Database size={16} className={`sm:mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                      <span className="hidden sm:inline">Rebuild Index</span>
                     </Button>
                   </DeleteConfirmDialog>
                 </div>
