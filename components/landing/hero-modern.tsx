@@ -35,13 +35,17 @@ export default function HeroModern() {
             className="text-center space-y-8 mb-16"
           >
             {/* Main Headline */}
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-foreground leading-tight">
-              AI for Smart Chatbots
+            <h1 className="font-[family-name:var(--font-space-grotesk)] text-5xl md:text-7xl lg:text-8xl font-bold text-foreground leading-[1.1] tracking-tight">
+              Make{" "}
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary to-secondary inline-block">
+                Chatbots
+              </span>
+              {" "}With your own knowledge
             </h1>
 
             {/* Subtitle */}
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-              Make smarter decisions with your data
+              a smarter chatbot than can answer question human-like
             </p>
 
             {/* CTA Button */}

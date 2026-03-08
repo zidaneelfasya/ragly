@@ -7,6 +7,8 @@ import VideoTutorial from "@/components/landing/video-tutorial"
 import PricingModern from "@/components/landing/pricing-modern"
 import CTAModern from "@/components/landing/cta-modern"
 import Footer from "@/components/footer-landing"
+import ProductDemoSection from "@/components/landing/product-demo-section"
+import ProductJourneySection from "@/components/landing/ProductJourneySection"
 
 export default function Home() {
   return (
@@ -16,7 +18,9 @@ export default function Home() {
       <StatsModern />
       <FeaturesModern />
       <ChatPreview />
-      <VideoTutorial />
+      {/* <VideoTutorial /> */}
+      {/* <ProductDemoSection /> */}
+      <ProductJourneySection />
       <PricingModern />
       <CTAModern />
       <Footer />
