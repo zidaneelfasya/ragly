@@ -3,11 +3,9 @@ import HeroModern from "@/components/landing/hero-modern"
 import StatsModern from "@/components/landing/stats-modern"
 import FeaturesModern from "@/components/landing/features-modern"
 import ChatPreview from "@/components/landing/chat-preview"
-import VideoTutorial from "@/components/landing/video-tutorial"
 import PricingModern from "@/components/landing/pricing-modern"
 import CTAModern from "@/components/landing/cta-modern"
 import Footer from "@/components/footer-landing"
-import ProductDemoSection from "@/components/landing/product-demo-section"
 import ProductJourneySection from "@/components/landing/ProductJourneySection"
 
 export default function Home() {
