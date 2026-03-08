@@ -35,6 +35,10 @@ COPY . .
 # Disable telemetry during build
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Enable standalone output for Docker deployment
+# (not set on Vercel, so Vercel uses the standard build and serves public/ via CDN)
+ENV BUILD_STANDALONE=true
+
 # Build the application
 RUN npm run build
 
