@@ -217,7 +217,7 @@ export default function ProductJourneySection() {
           <div className="absolute top-[20px] left-[15%] right-[15%] h-[2px] dark:bg-white/10 bg-black/10" />
           {/* Active connecting line */}
           <div 
-            className="absolute top-[20px] left-[15%] h-[2px] bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-700 ease-out"
+            className="absolute top-[20px] left-[15%] h-[2px] bg-gradient-to-r from-primary to-secondary transition-all duration-700 ease-out"
             style={{ width: `${(activeIndex / (steps.length - 1)) * 70}%` }}
           />
           
@@ -237,7 +237,7 @@ export default function ProductJourneySection() {
                 <div className={`
                   w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm md:text-base relative z-10 transition-all duration-500
                   ${activeIndex >= index 
-                    ? 'bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-[0_0_15px_rgba(59,130,246,0.5)] border-none' 
+                    ? 'bg-gradient-to-br from-primary to-secondary text-primary-foreground shadow-[0_0_15px_hsl(var(--primary)/0.5)] border-none' 
                     : 'dark:bg-black bg-background text-muted-foreground dark:border-white/20 border-border border'
                   }
                 `}>
@@ -282,7 +282,7 @@ export default function ProductJourneySection() {
               {/* Step badge + text */}
               <div className="flex items-start gap-4">
                 {/* Number badge */}
-                <div className="flex-shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-500/30">
+                <div className="flex-shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground font-bold text-sm shadow-lg shadow-primary/30">
                   {index + 1}
                 </div>
                 {/* Title + description */}
