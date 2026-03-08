@@ -1,22 +1,24 @@
 import Navbar from "@/components/navbar"
-import Hero from "@/components/hero"
-import Features from "@/components/features"
-import HowItWorks from "@/components/how-it-works"
-import Pricing from "@/components/pricing"
-import Testimonials from "@/components/testimonials"
-import CTA from "@/components/cta"
+import HeroModern from "@/components/landing/hero-modern"
+import StatsModern from "@/components/landing/stats-modern"
+import FeaturesModern from "@/components/landing/features-modern"
+import ChatPreview from "@/components/landing/chat-preview"
+import VideoTutorial from "@/components/landing/video-tutorial"
+import PricingModern from "@/components/landing/pricing-modern"
+import CTAModern from "@/components/landing/cta-modern"
 import Footer from "@/components/footer-landing"
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background overflow-hidden">
       <Navbar />
-      <Hero />
-      <Features />
-      <HowItWorks />
-      <Testimonials />
-      <Pricing />
-      <CTA />
+      <HeroModern />
+      <StatsModern />
+      <FeaturesModern />
+      <ChatPreview />
+      <VideoTutorial />
+      <PricingModern />
+      <CTAModern />
       <Footer />
     </main>
   )
