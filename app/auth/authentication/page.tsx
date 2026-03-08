@@ -404,7 +404,7 @@ const handleGoogleAuth = async () => {
                   />
                 </svg>
                 {(loginLoading || signupLoading) ? "Connecting..." : "Google"}
-                Google
+                
               </Button>
               {/* <Button
                 type="button"
