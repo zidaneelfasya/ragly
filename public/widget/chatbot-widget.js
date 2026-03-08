@@ -236,11 +236,14 @@
         }
         @media (max-width: 480px) {
           #ragly-chat-window {
-            width: calc(100vw - 20px) !important;
-            height: calc(100vh - 20px) !important;
-            bottom: 10px !important;
-            right: 10px !important;
+            position: fixed !important;
             left: 10px !important;
+            right: 10px !important;
+            bottom: 90px !important;
+            top: 10px !important;
+            width: auto !important;
+            height: auto !important;
+            max-height: none !important;
           }
         }
       </style>
