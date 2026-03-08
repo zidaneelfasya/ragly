@@ -62,7 +62,7 @@ export default function Navbar() {
             <Image src="/images/logo-ragly.svg" alt="Logo" width={32} height={32}>
 
             </Image>
-            ChatRAG
+            Ragly
           </Link>
 
           {/* Desktop Menu */}
