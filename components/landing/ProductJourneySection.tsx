@@ -12,17 +12,17 @@ const steps: Step[] = [
   {
     title: "Landing Page Experience",
     description: "Discover our intuitive platform designed for seamless chatbot integration",
-    videoSrc: "/landing/videos/landing-demo.mp4",
+    videoSrc: "https://jatizmgzqxcxyjdtswkc.supabase.co/storage/v1/object/public/landing_video/landing-demo.mp4",
   },
   {
     title: "Create Your Chatbot",
     description: "Build and customize your AI chatbot in minutes with our powerful tools",
-    videoSrc: "/landing/videos/create-chatbot-demo.mp4",
+    videoSrc: "https://jatizmgzqxcxyjdtswkc.supabase.co/storage/v1/object/public/landing_video/create-chatbot-demo.mp4",
   },
   {
     title: "Test and Deploy",
     description: "Preview, test, and deploy your chatbot to engage with your users",
-    videoSrc: "/landing/videos/test-chatbot-demo.mp4",
+    videoSrc: "https://jatizmgzqxcxyjdtswkc.supabase.co/storage/v1/object/public/landing_video/test-chatbot-demo.mp4",
   },
 ];
 
