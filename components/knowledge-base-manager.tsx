@@ -268,7 +268,7 @@ export default function KnowledgeBaseManager({ chatbotId }: KnowledgeBaseManager
                 <div>
                   <h3 className="text-lg font-medium">Upload Document</h3>
                   <p className="text-sm text-muted-foreground">
-                    Support PDF files up to 100MB
+                    Support PDF files 2MB free tier
                   </p>
                 </div>
                 
