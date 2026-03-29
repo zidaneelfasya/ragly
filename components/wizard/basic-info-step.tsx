@@ -104,7 +104,7 @@ export default function BasicInfoStep({ data, setData }: BasicInfoStepProps) {
           placeholder="e.g., You are a helpful customer support representative for an online store. Be friendly, professional, and always try to resolve issues quickly."
           value={data.personality}
           onChange={(e) => setData({ ...data, personality: e.target.value })}
-          className="w-full min-h-32 p-3 rounded-lg bg-input border border-border text-foreground placeholder-muted-foreground text-base"
+          className="w-full min-h-32 p-3 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground/70 placeholder:font-normal text-base"
         />
         <p className="text-xs text-muted-foreground mt-1">Define how your chatbot should behave and respond</p>
       </div>

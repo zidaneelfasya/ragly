@@ -342,7 +342,7 @@ export default function KnowledgeBaseStep({ data, setData, chatbotId }: Knowledg
           placeholder="Paste or type knowledge base content here. Markdown is supported."
           value={data.manualKnowledge}
           onChange={(e) => setData({ ...data, manualKnowledge: e.target.value })}
-          className="w-full min-h-40 p-3 rounded-lg bg-input border border-border text-foreground placeholder-muted-foreground text-base"
+          className="w-full min-h-40 p-3 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground/70 placeholder:font-normal text-base"
         />
         <p className="text-xs text-muted-foreground mt-1">Useful for FAQs or quick reference information</p>
       </div>

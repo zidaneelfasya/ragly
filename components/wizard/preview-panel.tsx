@@ -153,7 +153,7 @@ export default function PreviewPanel({ data }: PreviewPanelProps) {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
             placeholder="Try typing a message..."
-            className="flex-1 px-3 py-2 rounded-lg bg-input border border-border text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="flex-1 px-3 py-2 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground/70 placeholder:font-normal text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
           <button
             onClick={handleSendMessage}

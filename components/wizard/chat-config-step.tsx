@@ -94,7 +94,7 @@ export default function ChatConfigStep({ data, setData }: ChatConfigStepProps) {
                       placeholder="/command"
                       value={cmd.command}
                       onChange={(e) => updateCommand(index, 'command', e.target.value)}
-                      className="h-9 bg-input border-border text-sm"
+                      className="h-9 bg-input border-border text-sm placeholder:text-muted-foreground/70 placeholder:font-normal"
                     />
                   </td>
                   <td className="p-3">
@@ -102,7 +102,7 @@ export default function ChatConfigStep({ data, setData }: ChatConfigStepProps) {
                       placeholder="Command description"
                       value={cmd.description}
                       onChange={(e) => updateCommand(index, 'description', e.target.value)}
-                      className="h-9 bg-input border-border text-sm"
+                      className="h-9 bg-input border-border text-sm placeholder:text-muted-foreground/70 placeholder:font-normal"
                     />
                   </td>
                   <td className="p-3 text-center">
@@ -132,7 +132,7 @@ export default function ChatConfigStep({ data, setData }: ChatConfigStepProps) {
             id="welcome"
             value={data.welcomeMessage}
             onChange={(e) => setData({ ...data, welcomeMessage: e.target.value })}
-            className="w-full min-h-20 p-3 rounded-lg bg-input border border-border text-foreground placeholder-muted-foreground text-sm"
+            className="w-full min-h-20 p-3 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground/70 placeholder:font-normal text-sm"
           />
         </div>
 
@@ -144,7 +144,7 @@ export default function ChatConfigStep({ data, setData }: ChatConfigStepProps) {
             id="fallback"
             value={data.fallbackMessage}
             onChange={(e) => setData({ ...data, fallbackMessage: e.target.value })}
-            className="w-full min-h-20 p-3 rounded-lg bg-input border border-border text-foreground placeholder-muted-foreground text-sm"
+            className="w-full min-h-20 p-3 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground/70 placeholder:font-normal text-sm"
           />
         </div>
       </div>
