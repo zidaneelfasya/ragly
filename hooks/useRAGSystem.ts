@@ -37,8 +37,8 @@ export function useRAGSystem() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const api = process.env.NEXT_PUBLIC_RAG_BASE_URL || 'http://localhost:8080';
-  console.log('RAG API Base URL:', api);
-  console.log('NEXT_PUBLIC_RAG_BASE_URL:', process.env.NEXT_PUBLIC_RAG_BASE_URL);
+  // console.log('RAG API Base URL:', api);
+  // console.log('NEXT_PUBLIC_RAG_BASE_URL:', process.env.NEXT_PUBLIC_RAG_BASE_URL);
   const ragApiUrl = `${api}/api/v1/ragly`; // Base URL for RAG API endpoints, adjust if needed
 
   

@@ -4,6 +4,7 @@
 // Route ini akan forward semua request webhook ke Express service yang berjalan di VPS
 
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 
 // URL Express service yang berjalan di VPS
 const TELEGRAM_WEBHOOK_SERVICE_URL = process.env.TELEGRAM_WEBHOOK_SERVICE_URL || 'http://localhost:3001';
@@ -54,6 +55,31 @@ export async function POST(
 
     const data = await response.json();
     const duration = Date.now() - startTime;
+    
+    // Attempt to save conversation to generic table
+    try {
+      const supabase = await createClient();
+      
+      const userMessage = body.message?.text || '';
+      // Assume express might return the ai_response in data.reply or data.ai_response or data.response.
+      // If none exist, we'll just save what we can, maybe it'll be updated later or we just save the user message.
+      const aiResponse = data.reply || data.ai_response || data.response || data.aiResponse || '';
+      const telegramChatId = body.message?.chat?.id?.toString() || '';
+
+      if (userMessage) {
+        await supabase
+          .from('chatbot_conversations')
+          .insert({
+            chatbot_id: chatbotId,
+            session_id: telegramChatId,
+            source: 'telegram',
+            user_message: userMessage,
+            ai_response: aiResponse,
+          });
+      }
+    } catch (dbError) {
+      console.error('❌ Error saving to chatbot_conversations:', dbError);
+    }
     
     console.log('✅ Successfully forwarded to Express service');
     console.log(`⏱️  Total Duration: ${duration}ms`);

@@ -117,3 +117,15 @@ CREATE TABLE IF NOT EXISTS telegram_conversations (
     INDEX(chatbot_id, timestamp),
     INDEX(telegram_chat_id, timestamp)
 );
+
+-- Create table for storing all chatbot conversations (widget, telegram, etc.)
+CREATE TABLE IF NOT EXISTS chatbot_conversations (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    chatbot_id UUID NOT NULL REFERENCES chatbots(id) ON DELETE CASCADE,
+    session_id TEXT, -- To group messages in a session (e.g., telegram chat id or widget session)
+    source TEXT NOT NULL DEFAULT 'widget', -- e.g., 'telegram', 'widget', 'test'
+    user_message TEXT,
+    ai_response TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+

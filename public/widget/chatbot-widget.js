@@ -28,6 +28,11 @@
   let isOpen = false;
   let messages = [];
   let isLoading = false;
+  let sessionId = localStorage.getItem('ragly_session_id');
+  if (!sessionId) {
+    sessionId = 'session_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    localStorage.setItem('ragly_session_id', sessionId);
+  }
 
   // Create widget HTML
   function createWidget() {
@@ -371,7 +376,7 @@
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message, sessionId }),
       });
 
       if (!response.ok) {

@@ -226,7 +226,7 @@ export default function ChatbotsPage() {
                       <span>Created {formatDate(chatbot.created_at)}</span>
                       <div className="flex items-center gap-1">
                         <Users size={12} />
-                        <span>0 chats</span>
+                        <span>{chatbot.chatbot_conversations?.[0]?.count || 0} messages</span>
                       </div>
                     </div>
                   </div>

@@ -16,13 +16,14 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get specific chatbot with its commands and files
+    // Get specific chatbot with its commands, files, and conversation count
     const { data: chatbot, error } = await supabase
       .from('chatbots')
       .select(`
         *,
         chatbot_commands (*),
-        chatbot_rag_files (*)
+        chatbot_rag_files (*),
+        chatbot_conversations (count)
       `)
       .eq('id', id)
       .eq('user_id', user.id)

@@ -154,13 +154,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user's chatbots
+    // Get user's chatbots and conversation counts
+    // We use a separate query or adjust the select to include conversations count
     const { data: chatbots, error } = await supabase
       .from('chatbots')
       .select(`
         *,
         chatbot_commands (*),
-        chatbot_rag_files (*)
+        chatbot_rag_files (*),
+        chatbot_conversations (count)
       `)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });

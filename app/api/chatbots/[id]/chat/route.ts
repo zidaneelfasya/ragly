@@ -237,10 +237,11 @@ export async function POST(
 
   try {
     const { id: chatbotId } = await params;
-    const { message } = await request.json();
+    const { message, sessionId = 'widget-session' } = await request.json();
 
     console.log('📋 Chatbot ID:', chatbotId);
     console.log('📨 Message:', message);
+    console.log('🔑 Session ID:', sessionId);
 
     // Get user session
     const supabase = await createClient();
@@ -301,6 +302,21 @@ export async function POST(
       console.log('✅ Response generated successfully');
       console.log(`⏱️  Total Duration: ${duration}ms`);
       console.log('='.repeat(80) + '\n');
+      
+      // Save conversation to database
+      const { error: insertError } = await supabase
+        .from('chatbot_conversations')
+        .insert({
+          chatbot_id: chatbotId,
+          session_id: sessionId,
+          source: 'widget',
+          user_message: message,
+          ai_response: aiResponse,
+        });
+        
+      if (insertError) {
+        console.error('❌ Error saving conversation:', insertError);
+      }
 
       return NextResponse.json({
         success: true,

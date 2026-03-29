@@ -801,7 +801,7 @@ export default function ChatbotDetailPage() {
 										<span>Total Messages</span>
 									</div>
 									<span className="font-semibold">
-										{telegramStats?.totalConversations?.toLocaleString() || 0}
+										{chatbot?.chatbot_conversations?.[0]?.count || 0}
 									</span>
 								</div>
 
