@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { Mail, Lock, User as UserIcon, Phone } from "lucide-react";
 import Image from "next/image";
+import { SubmitLoading } from "@/components/ui/submit-loading";
 
 type TabType = "login" | "signup";
 
@@ -83,6 +84,14 @@ export default function AuthenticationPage() {
       });
 
       if (authError) throw authError;
+
+      // Supabase email enumeration protection check. 
+      // If the email is already registered, it returns an empty identities array.
+      if (authData.user && authData.user.identities && authData.user.identities.length === 0) {
+        setSignupError("Email sudah terdaftar. Silakan gunakan email lain atau langsung Login.");
+        setSignupLoading(false);
+        return;
+      }
 
       // Profile will be automatically created by database trigger
       // Redirect to success page
@@ -168,7 +177,11 @@ const handleGoogleAuth = async () => {
       </div>
 
       {/* Right Side - Auth Forms */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-10 bg-background">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-10 bg-background relative">
+        <SubmitLoading 
+          isLoading={loginLoading || signupLoading} 
+          text={loginLoading ? "Memverifikasi Kredensial..." : "Membuat Akun..."} 
+        />
         <div className="w-full max-w-md">
           <div className="flex flex-col gap-6">
             {/* Logo */}

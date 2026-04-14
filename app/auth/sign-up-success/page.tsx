@@ -4,7 +4,10 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Page() {
   return (
@@ -19,11 +22,16 @@ export default function Page() {
               <CardDescription>Check your email to confirm</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mb-4">
                 You&apos;ve successfully signed up. Please check your email to
                 confirm your account before signing in.
               </p>
             </CardContent>
+            <CardFooter>
+              <Link href="/" className="w-full">
+                <Button className="w-full">Kembali ke Beranda</Button>
+              </Link>
+            </CardFooter>
           </Card>
         </div>
       </div>
