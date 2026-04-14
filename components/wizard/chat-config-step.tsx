@@ -1,10 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -19,107 +15,10 @@ interface ChatConfigStepProps {
 }
 
 export default function ChatConfigStep({ data, setData }: ChatConfigStepProps) {
-  const [commands, setCommands] = useState([
-    { command: '/help', description: 'Get help with common questions' },
-  ]);
-
   const tones = ['Friendly', 'Professional', 'Direct', 'Formal', 'Casual'];
-
-  // Initialize commands in parent data when component mounts
-  useEffect(() => {
-    if (!data.commands || data.commands.length === 0) {
-      const defaultCommands = [{ command: '/help', description: 'Get help with common questions' }];
-      setCommands(defaultCommands);
-      setData({ ...data, commands: defaultCommands });
-    } else {
-      setCommands(data.commands);
-    }
-  }, []); // Empty dependency array to run only on mount
-
-  // Update parent data whenever local commands change
-  const updateParentData = (newCommands: any[]) => {
-    setData((prevData: any) => ({ ...prevData, commands: newCommands }));
-  };
-
-  const addCommand = () => {
-    const newCommands = [...commands, { command: '', description: '' }];
-    setCommands(newCommands);
-    updateParentData(newCommands);
-  };
-
-  const removeCommand = (index: number) => {
-    const newCommands = commands.filter((_, i) => i !== index);
-    setCommands(newCommands);
-    updateParentData(newCommands);
-  };
-
-  const updateCommand = (index: number, field: string, value: string) => {
-    const updated = [...commands];
-    updated[index] = { ...updated[index], [field]: value };
-    setCommands(updated);
-    updateParentData(updated);
-  };
 
   return (
     <div className="space-y-8">
-      {/* Command Builder */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <Label className="text-base font-semibold">Custom Commands</Label>
-          <Button
-            type="button"
-            onClick={addCommand}
-            variant="outline"
-            size="sm"
-            className="gap-2 border-primary text-primary hover:bg-primary/5"
-          >
-            <Plus size={16} /> Add Command
-          </Button>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="text-left p-3 font-semibold text-foreground">/Command</th>
-                <th className="text-left p-3 font-semibold text-foreground">Description</th>
-                <th className="text-center p-3 font-semibold text-foreground w-12">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {commands.map((cmd, index) => (
-                <tr key={index} className="border-b border-border hover:bg-muted/50 transition-colors">
-                  <td className="p-3">
-                    <Input
-                      placeholder="/command"
-                      value={cmd.command}
-                      onChange={(e) => updateCommand(index, 'command', e.target.value)}
-                      className="h-9 bg-input border-border text-sm placeholder:text-muted-foreground/70 placeholder:font-normal"
-                    />
-                  </td>
-                  <td className="p-3">
-                    <Input
-                      placeholder="Command description"
-                      value={cmd.description}
-                      onChange={(e) => updateCommand(index, 'description', e.target.value)}
-                      className="h-9 bg-input border-border text-sm placeholder:text-muted-foreground/70 placeholder:font-normal"
-                    />
-                  </td>
-                  <td className="p-3 text-center">
-                    <button
-                      onClick={() => removeCommand(index)}
-                      className="text-destructive hover:text-destructive/80 transition-colors inline-flex"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
       {/* Custom Messages */}
       <div className="space-y-4">
         <h3 className="font-semibold text-foreground">Custom Responses</h3>

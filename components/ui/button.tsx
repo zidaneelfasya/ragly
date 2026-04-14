@@ -1,6 +1,10 @@
+"use client"
+
 import * as React from "react"
+import { useFormStatus } from "react-dom"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
+import { Loader2 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -38,17 +42,55 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean
+  isLoading?: boolean
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button"
+  ({ className, variant, size, asChild = false, isLoading: externalIsLoading = false, children, disabled, onClick, type, ...props }, ref) => {
+    const { pending } = useFormStatus()
+    const [internalIsLoading, setInternalIsLoading] = React.useState(false)
+    const isFormLoading = pending && type === "submit"
+    const isLoading = externalIsLoading || internalIsLoading || isFormLoading
+
+    const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (!onClick) return
+      const result = onClick(e)
+      if (result instanceof Promise) {
+        setInternalIsLoading(true)
+        try {
+          await result
+        } finally {
+          setInternalIsLoading(false)
+        }
+      }
+    }
+
+    if (asChild) {
+      return (
+        <Slot
+          className={cn(buttonVariants({ variant, size, className }))}
+          ref={ref}
+          onClick={handleClick}
+          disabled={disabled || isLoading}
+          {...props}
+        >
+          {children}
+        </Slot>
+      )
+    }
+
     return (
-      <Comp
+      <button
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        disabled={disabled || isLoading}
+        onClick={handleClick}
+        type={type}
         {...props}
-      />
+      >
+        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {children}
+      </button>
     )
   }
 )
