@@ -54,7 +54,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
       if (!onClick) return
-      const result = onClick(e)
+      const result = onClick(e) as unknown
       if (result instanceof Promise) {
         setInternalIsLoading(true)
         try {
@@ -71,7 +71,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           className={cn(buttonVariants({ variant, size, className }))}
           ref={ref}
           onClick={handleClick}
-          disabled={disabled || isLoading}
+          {...({ disabled: disabled || isLoading } as any)}
           {...props}
         >
           {children}
