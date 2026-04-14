@@ -4,15 +4,12 @@ import { createContext, useContext, useState, useCallback, useEffect } from 'rea
 import Link from 'next/link';
 import { Bot, User, Menu, X, LayoutDashboard, Settings, LogOut, ChevronUp } from 'lucide-react';
 import { ThemeSwitcher } from '@/components/theme-switcher';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useRouter } from 'next/navigation';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { Loader2 } from 'lucide-react';
+import { SubmitLoading } from "@/components/ui/submit-loading";
+import Image from 'next/image';
 
 // Sidebar Context
 const SidebarContext = createContext<{
@@ -128,6 +125,15 @@ export function SidebarProvider({ children }: SidebarProviderProps) {
 export function Sidebar({ user }: { user: any }) {
   const { isOpen, close } = useContext(SidebarContext);
   const router = useRouter();
+  const pathname = usePathname();
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [targetPath, setTargetPath] = useState("");
+
+  // Automatically turn off loading overlay when pathway updates
+  useEffect(() => {
+    setIsNavigating(false);
+    setTargetPath("");
+  }, [pathname]);
 
   // Definisikan navItems di client component
   const navItems = [
@@ -137,7 +143,13 @@ export function Sidebar({ user }: { user: any }) {
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ];
   
-  const handleNavClick = () => {
+  const handleNavClick = (href: string) => {
+    // If navigating to a different page, trigger the loading state
+    if (pathname !== href) {
+      setIsNavigating(true);
+      setTargetPath(href);
+    }
+    
     // Close sidebar on mobile after navigation
     if (window.innerWidth < 1024) {
       close();
@@ -179,10 +191,14 @@ export function Sidebar({ user }: { user: any }) {
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center justify-between border-b border-border px-6">
-            <Link href="/dashboard" className="flex items-center gap-2" onClick={handleNavClick}>
-              {/* <Bot className="h-8 w-8 text-primary" /> */}
-              <span className="text-lg font-bold text-foreground">Ragly</span>
-            </Link>
+            <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
+            {/* <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground">
+              ◆
+            </div> */}
+            <Image src="/images/logo-ragly.svg" alt="Logo" width={32} height={32}>
+            </Image>
+            Ragly
+          </Link>
             
             {/* Close button for mobile */}
             <button
@@ -197,14 +213,19 @@ export function Sidebar({ user }: { user: any }) {
           <nav className="flex-1 space-y-1 p-4">
             {navItems.map((item) => {
               const Icon = item.icon;
+              const isActive = item.href === '/dashboard' ? pathname === item.href : pathname.startsWith(item.href);
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  onClick={handleNavClick}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                  onClick={() => handleNavClick(item.href)}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+                    isActive 
+                    ? 'bg-primary/10 text-primary font-medium' 
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                  }`}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className={`h-4 w-4 ${isActive ? 'text-primary' : ''}`} />
                   {item.name}
                 </Link>
               );
@@ -253,7 +274,7 @@ export function Sidebar({ user }: { user: any }) {
                   <Link 
                     href="/dashboard/profile" 
                     className="cursor-pointer flex items-center"
-                    onClick={handleNavClick}
+                    onClick={() => handleNavClick("/dashboard/profile")}
                   >
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
@@ -272,6 +293,11 @@ export function Sidebar({ user }: { user: any }) {
           </div>
         </div>
       </aside>
+
+      <SubmitLoading 
+        isLoading={isNavigating && pathname !== targetPath} 
+        text="Memuat Halaman..." 
+      />
     </>
   );
 }
